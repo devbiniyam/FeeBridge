@@ -4,11 +4,12 @@ from api.views.accounts import MeView, RegisterView
 from api.views.students import StudentListCreateView, StudentDetailView
 from api.views.fees import FeeStructureListCreateView, FeeStructureDetailView, InvoiceListCreateView, InvoiceDetailView
 from api.views.payments import PaymentCreateView
-from api.views.wallets import DepositView
+from api.views.wallets import DepositView, WalletPaymentView
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
     path('me/', MeView.as_view(), name='me'),
     path('register/', RegisterView.as_view(), name='register'),
     
@@ -24,4 +25,5 @@ urlpatterns = [
     path('payments/', PaymentCreateView.as_view(), name='payment-create'),
     
     path('wallets/deposit/', DepositView.as_view(), name='wallet-deposit'),
+    path('wallets/pay-invoice/', WalletPaymentView.as_view(), name='wallet-pay-invoice'),
 ]
