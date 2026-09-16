@@ -12,6 +12,7 @@ from api.views.notifications import (
     NotificationMarkAllAsReadView,
     NotificationUnreadCountView,
 )
+from api.views.reports import FinancialSummaryReportView, GradeBreakdownReportView
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -41,4 +42,7 @@ urlpatterns = [
     path('notifications/mark-all-as-read/', NotificationMarkAllAsReadView.as_view(), name='notification-mark-all-as-read'),
     path('notifications/<int:pk>/', NotificationDetailView.as_view(), name='notification-detail'),
     path('notifications/<int:pk>/mark-as-read/', NotificationMarkAsReadView.as_view(), name='notification-mark-as-read'),
+
+    path('reports/financial-summary/', FinancialSummaryReportView.as_view(), name='report-financial-summary'),
+    path('reports/grade-breakdown/', GradeBreakdownReportView.as_view(), name='report-grade-breakdown'),
 ]
