@@ -1,6 +1,8 @@
+from django.db import transaction
 from rest_framework import serializers
-from fees.models import Invoice, StatusChoices
-from payments.models import Payment, Receipt
+from fees.models import Invoice
+from payments.models import PaymentChoices
+from payments.services import process_payment
 from wallets.models import Wallet, WalletTransaction, TransactionChoices
 
 
@@ -10,60 +12,62 @@ class DepositSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['wallet', 'transaction_type']
 
+    @transaction.atomic
     def create(self, validated_data):
         user = self.context['request'].user
-        validated_data['wallet'] = user.wallet
-        validated_data['transaction_type'] = TransactionChoices.DEPOSIT
-        transaction = super().create(validated_data)
+        wallet = Wallet.objects.select_for_update().get(parent=user)
 
-        wallet = transaction.wallet
-        wallet.balance += transaction.amount
+        validated_data['wallet'] = wallet
+        validated_data['transaction_type'] = TransactionChoices.DEPOSIT
+        transaction_obj = super().create(validated_data)
+
+        wallet.balance += transaction_obj.amount
         wallet.save()
 
-        return transaction
+        return transaction_obj
 
 
 class WalletPaymentSerializer(serializers.Serializer):
     invoice = serializers.PrimaryKeyRelatedField(queryset=Invoice.objects.all())
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
     def validate(self, data):
         invoice = data['invoice']
         user = self.context['request'].user
-        wallet = user.wallet
+        wallet = getattr(user, 'wallet', None)
 
-        if wallet.balance < invoice.amount:
-            raise serializers.ValidationError("Insufficient wallet balance.")
+        if not wallet:
+            raise serializers.ValidationError("User does not have a wallet.")
+
+        amount = data.get('amount')
+        if not amount:
+            amount = invoice.balance_remaining
+            data['amount'] = amount
+
+        if amount <= 0:
+            raise serializers.ValidationError("Payment amount must be greater than zero.")
+
+        if amount > invoice.balance_remaining:
+            raise serializers.ValidationError(
+                f"Amount ({amount} ETB) exceeds outstanding balance ({invoice.balance_remaining} ETB)."
+            )
+
+        if wallet.balance < amount:
+            raise serializers.ValidationError(
+                f"Insufficient wallet balance ({wallet.balance} ETB < {amount} ETB)."
+            )
 
         return data
 
     def create(self, validated_data):
         invoice = validated_data['invoice']
         user = self.context['request'].user
-        wallet = user.wallet
+        amount = validated_data['amount']
 
-        wallet.balance -= invoice.amount
-        wallet.save()
-
-        WalletTransaction.objects.create(
-            wallet=wallet,
-            transaction_type=TransactionChoices.DEDUCTION,
-            amount=invoice.amount,
-            related_invoice=invoice
-        )
-
-        payment = Payment.objects.create(
+        return process_payment(
             invoice=invoice,
             paid_by=user,
-            amount=invoice.amount,
-            method='WALLET'
+            amount=amount,
+            method=PaymentChoices.WALLET,
+            wallet=user.wallet
         )
-
-        invoice.status = StatusChoices.PAID
-        invoice.save()
-
-        Receipt.objects.create(
-            payment=payment,
-            receipt_number=f"RCP-{payment.id:06d}"
-        )
-
-        return payment

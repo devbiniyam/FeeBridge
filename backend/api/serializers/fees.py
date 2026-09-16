@@ -8,10 +8,12 @@ class FeeStructureSerializer(serializers.ModelSerializer):
       
 
 class InvoiceSerializer(serializers.ModelSerializer):
+    balance_remaining = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+
     class Meta:
         model = Invoice
         fields = '__all__'
-        read_only_fields = ['amount']
+        read_only_fields = ['amount', 'amount_paid', 'balance_remaining']
 
     def create(self, validated_data):
         validated_data['amount'] = validated_data['fee_structure'].amount
