@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'fees',
     'notifications',
     'payments',
-    'wallets'
+    'wallets',
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

@@ -5,6 +5,13 @@ from api.views.students import StudentListCreateView, StudentDetailView
 from api.views.fees import FeeStructureListCreateView, FeeStructureDetailView, InvoiceListCreateView, InvoiceDetailView
 from api.views.payments import PaymentCreateView
 from api.views.wallets import DepositView, WalletPaymentView
+from api.views.notifications import (
+    NotificationListCreateView,
+    NotificationDetailView,
+    NotificationMarkAsReadView,
+    NotificationMarkAllAsReadView,
+    NotificationUnreadCountView,
+)
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -28,4 +35,10 @@ urlpatterns = [
     path('wallets/pay-invoice/', WalletPaymentView.as_view(), name='wallet-pay-invoice'),
     
     path('staff/create/', StaffCreateView.as_view(), name='staff-create'),
+
+    path('notifications/', NotificationListCreateView.as_view(), name='notification-list-create'),
+    path('notifications/unread-count/', NotificationUnreadCountView.as_view(), name='notification-unread-count'),
+    path('notifications/mark-all-as-read/', NotificationMarkAllAsReadView.as_view(), name='notification-mark-all-as-read'),
+    path('notifications/<int:pk>/', NotificationDetailView.as_view(), name='notification-detail'),
+    path('notifications/<int:pk>/mark-as-read/', NotificationMarkAsReadView.as_view(), name='notification-mark-as-read'),
 ]
