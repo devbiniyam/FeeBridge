@@ -76,3 +76,57 @@ def process_payment(invoice, paid_by, amount, method=PaymentChoices.DIRECT, wall
     )
 
     return payment
+
+
+@transaction.atomic
+def fulfill_gateway_transaction(gateway_transaction, gateway_reference=None):
+    """
+    Fulfill a gateway transaction (e.g. from Chapa webhook).
+    Ensures idempotency, settles invoice or credits wallet, and updates transaction status to SUCCESS.
+    """
+    from payments.models import (
+        GatewayTransaction,
+        GatewayTransactionStatus,
+        TransactionPurposeChoices,
+        PaymentChoices
+    )
+
+    # Lock gateway transaction row
+    tx = GatewayTransaction.objects.select_for_update().get(id=gateway_transaction.id)
+
+    # Idempotency check: if already processed, return early
+    if tx.status == GatewayTransactionStatus.SUCCESS:
+        return tx
+
+    if tx.purpose == TransactionPurposeChoices.INVOICE_PAYMENT:
+        if not tx.related_invoice:
+            raise ValidationError("Transaction has no associated invoice.")
+
+        process_payment(
+            invoice=tx.related_invoice,
+            paid_by=tx.user,
+            amount=tx.amount,
+            method=PaymentChoices.CHAPA
+        )
+
+    elif tx.purpose == TransactionPurposeChoices.WALLET_DEPOSIT:
+        wallet = getattr(tx.user, 'wallet', None)
+        if not wallet:
+            raise ValidationError("User does not have a wallet.")
+
+        locked_wallet = Wallet.objects.select_for_update().get(id=wallet.id)
+        locked_wallet.balance += tx.amount
+        locked_wallet.save()
+
+        WalletTransaction.objects.create(
+            wallet=locked_wallet,
+            transaction_type=TransactionChoices.DEPOSIT,
+            amount=tx.amount
+        )
+
+    tx.status = GatewayTransactionStatus.SUCCESS
+    if gateway_reference:
+        tx.gateway_reference = gateway_reference
+    tx.save()
+
+    return tx

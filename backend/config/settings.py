@@ -142,3 +142,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+# Chapa Payment Gateway Configuration
+CHAPA_SECRET_KEY = config('CHAPA_SECRET_KEY', default='CHASECK_TEST-mock-secret-key')
+CHAPA_WEBHOOK_SECRET = config('CHAPA_WEBHOOK_SECRET', default='mock-webhook-secret')
+CHAPA_API_URL = config('CHAPA_API_URL', default='https://api.chapa.co/v1')

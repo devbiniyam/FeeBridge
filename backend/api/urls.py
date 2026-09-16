@@ -13,6 +13,11 @@ from api.views.notifications import (
     NotificationUnreadCountView,
 )
 from api.views.reports import FinancialSummaryReportView, GradeBreakdownReportView
+from api.views.gateways import (
+    CheckoutInitializeView,
+    ChapaWebhookView,
+    CheckoutVerifyView,
+)
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -31,6 +36,9 @@ urlpatterns = [
     path('invoices/<int:pk>/', InvoiceDetailView.as_view(), name='invoice-detail'),
     
     path('payments/', PaymentCreateView.as_view(), name='payment-create'),
+    path('payments/checkout/initialize/', CheckoutInitializeView.as_view(), name='checkout-initialize'),
+    path('payments/checkout/verify/<str:tx_ref>/', CheckoutVerifyView.as_view(), name='checkout-verify'),
+    path('payments/webhook/chapa/', ChapaWebhookView.as_view(), name='webhook-chapa'),
     
     path('wallets/deposit/', DepositView.as_view(), name='wallet-deposit'),
     path('wallets/pay-invoice/', WalletPaymentView.as_view(), name='wallet-pay-invoice'),
