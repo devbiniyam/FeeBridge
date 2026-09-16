@@ -3,9 +3,11 @@ from accounts.models import User, RoleChoices
 
 
 class UserSerializer(serializers.ModelSerializer):
+    school_name = serializers.ReadOnlyField(source='school.name')
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'role', 'phone_number', 'email']
+        fields = ['id', 'first_name', 'last_name', 'role', 'phone_number', 'email', 'school', 'school_name']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -28,7 +30,7 @@ class StaffCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'phone_number', 'email', 'password', 'gender', 'role']
+        fields = ['id', 'first_name', 'last_name', 'phone_number', 'email', 'password', 'gender', 'role', 'school']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
