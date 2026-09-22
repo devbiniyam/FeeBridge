@@ -1,8 +1,17 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { GraduationCap, LogOut, User, Building, ShieldCheck } from 'lucide-react';
+import {
+  GraduationCap,
+  LogOut,
+  User,
+  Building,
+  ShieldCheck,
+  LayoutDashboard,
+  Receipt,
+  Wallet
+} from 'lucide-react';
 
-export default function Navbar() {
+export default function Navbar({ currentView, onSelectView }) {
   const { user, logout } = useAuth();
 
   const getRoleBadge = (role) => {
@@ -18,18 +27,51 @@ export default function Navbar() {
 
   return (
     <header className="navbar">
-      <div className="navbar-brand">
-        <div className="brand-icon">
-          <GraduationCap size={26} />
+      <div className="navbar-brand-section">
+        <div className="navbar-brand" onClick={() => onSelectView && onSelectView('dashboard')} style={{ cursor: 'pointer' }}>
+          <div className="brand-icon">
+            <GraduationCap size={24} />
+          </div>
+          <div className="brand-text">
+            <span className="brand-title">FeeBridge</span>
+            <span className="brand-subtitle">School Fee & Digital Wallet</span>
+          </div>
         </div>
-        <div className="brand-text">
-          <span className="brand-title">FeeBridge</span>
-          <span className="brand-subtitle">School Fee & Digital Wallet</span>
-        </div>
+
+        {user && (
+          <nav className="nav-links">
+            <button
+              type="button"
+              className={`nav-link-btn ${currentView === 'dashboard' ? 'nav-link-active' : ''}`}
+              onClick={() => onSelectView('dashboard')}
+            >
+              <LayoutDashboard size={15} />
+              <span>Dashboard</span>
+            </button>
+            <button
+              type="button"
+              className={`nav-link-btn ${currentView === 'invoices' ? 'nav-link-active' : ''}`}
+              onClick={() => onSelectView('invoices')}
+            >
+              <Receipt size={15} />
+              <span>Invoices</span>
+            </button>
+          </nav>
+        )}
       </div>
 
       {user && (
         <div className="navbar-user">
+          {user.role === 'PARENT' && user.wallet_balance !== undefined && (
+            <div className="nav-wallet-pill" title="Current Digital Wallet Balance">
+              <Wallet size={14} className="nav-wallet-icon" />
+              <div className="nav-wallet-texts">
+                <span className="nav-wallet-label">Wallet</span>
+                <strong className="nav-wallet-amount">{parseFloat(user.wallet_balance).toFixed(2)} ETB</strong>
+              </div>
+            </div>
+          )}
+
           <div className="user-details">
             <div className="user-name-row">
               <span className="user-name">{user.first_name} {user.last_name}</span>

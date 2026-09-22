@@ -71,3 +71,19 @@ class WalletPaymentSerializer(serializers.Serializer):
             method=PaymentChoices.WALLET,
             wallet=user.wallet
         )
+
+    def to_representation(self, instance):
+        receipt = getattr(instance, 'receipt', None)
+        user = self.context['request'].user
+        wallet = getattr(user, 'wallet', None)
+        return {
+            'payment_id': instance.id,
+            'receipt_number': receipt.receipt_number if receipt else f"RCP-{instance.id:06d}",
+            'invoice_id': instance.invoice.id,
+            'amount_paid': str(instance.amount),
+            'method': instance.method,
+            'paid_at': instance.paid_at.isoformat() if instance.paid_at else None,
+            'invoice_status': instance.invoice.status,
+            'invoice_balance': str(instance.invoice.balance_remaining),
+            'wallet_balance': str(wallet.balance) if wallet else "0.00"
+        }

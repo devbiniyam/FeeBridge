@@ -2,7 +2,13 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from api.views.accounts import MeView, RegisterView, StaffCreateView
 from api.views.students import StudentListCreateView, StudentDetailView
-from api.views.fees import FeeStructureListCreateView, FeeStructureDetailView, InvoiceListCreateView, InvoiceDetailView
+from api.views.fees import (
+    FeeStructureListCreateView,
+    FeeStructureDetailView,
+    InvoiceListCreateView,
+    InvoiceDetailView,
+    BatchGenerateInvoicesView
+)
 from api.views.payments import PaymentCreateView
 from api.views.wallets import DepositView, WalletPaymentView
 from api.views.notifications import (
@@ -33,6 +39,7 @@ urlpatterns = [
     path('fee-structures/<int:pk>/', FeeStructureDetailView.as_view(), name='fee-structure-detail'),
 
     path('invoices/', InvoiceListCreateView.as_view(), name='invoice-list-create'),
+    path('invoices/generate/', BatchGenerateInvoicesView.as_view(), name='invoice-batch-generate'),
     path('invoices/<int:pk>/', InvoiceDetailView.as_view(), name='invoice-detail'),
     
     path('payments/', PaymentCreateView.as_view(), name='payment-create'),

@@ -11,10 +11,11 @@ import {
   Users,
   CreditCard,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  ArrowRight
 } from 'lucide-react';
 
-export default function Dashboard() {
+export default function Dashboard({ onNavigate }) {
   const { user } = useAuth();
   const isParent = user?.role === 'PARENT';
   const isStaff = user?.role === 'STAFF';
@@ -64,6 +65,12 @@ export default function Dashboard() {
             <span className="profile-label">Account Role</span>
             <span className="profile-value highlight-role">{user?.role}</span>
           </div>
+          {isParent && user?.wallet_balance !== undefined && (
+            <div className="profile-item">
+              <span className="profile-label">Digital Wallet Balance</span>
+              <span className="profile-value highlight-school">{parseFloat(user.wallet_balance).toFixed(2)} ETB</span>
+            </div>
+          )}
           {user?.school_name && (
             <div className="profile-item">
               <span className="profile-label">Assigned School</span>
@@ -79,44 +86,79 @@ export default function Dashboard() {
         <div className="module-grid">
           {isParent ? (
             <>
-              <div className="module-card module-invoices">
+              {/* Invoices Module - ACTIVE */}
+              <div
+                className="module-card module-invoices module-clickable"
+                onClick={() => onNavigate && onNavigate('invoices')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="module-icon icon-amber">
                   <Receipt size={24} />
                 </div>
                 <h4>School Invoices</h4>
-                <p>View pending monthly tuition invoices, due dates, and outstanding balances.</p>
-                <span className="module-tag tag-invoices">Next Feature</span>
+                <p>View pending monthly tuition invoices, due dates, outstanding balances, and settle online.</p>
+                <span className="module-tag tag-ready">
+                  <CheckCircle2 size={12} /> Open Invoices Portal <ArrowRight size={12} />
+                </span>
               </div>
 
+              {/* Digital Wallet */}
               <div className="module-card module-wallet">
                 <div className="module-icon icon-emerald">
                   <Wallet size={24} />
                 </div>
                 <h4>Digital Wallet</h4>
                 <p>Deposit funds and enable automated invoice deductions without bank queues.</p>
-                <span className="module-tag tag-wallet">Next Feature</span>
+                <span className="module-tag tag-wallet">
+                  Balance: {parseFloat(user?.wallet_balance || 0).toFixed(2)} ETB
+                </span>
               </div>
 
-              <div className="module-card module-pay">
+              {/* Online Gateway */}
+              <div
+                className="module-card module-pay module-clickable"
+                onClick={() => onNavigate && onNavigate('invoices')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="module-icon icon-cyan">
                   <CreditCard size={24} />
                 </div>
                 <h4>Online Gateway</h4>
                 <p>Pay instantly with Telebirr, CBE Birr, or Bank Cards powered by Chapa.</p>
-                <span className="module-tag tag-pay">Next Feature</span>
+                <span className="module-tag tag-pay">Pay via Invoices</span>
               </div>
 
+              {/* Notifications */}
               <div className="module-card module-notify">
                 <div className="module-icon icon-rose">
                   <Bell size={24} />
                 </div>
                 <h4>Notifications</h4>
                 <p>Real-time payment confirmations, upcoming due reminders, and alerts.</p>
-                <span className="module-tag tag-notify">Next Feature</span>
+                <span className="module-tag tag-notify">Next Module</span>
               </div>
             </>
           ) : (
             <>
+              {/* Staff Invoices Overview - ACTIVE */}
+              <div
+                className="module-card module-invoices module-clickable"
+                onClick={() => onNavigate && onNavigate('invoices')}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="module-icon icon-amber">
+                  <Receipt size={24} />
+                </div>
+                <h4>School Invoices</h4>
+                <p>Track student tuition invoices, collection rates, and outstanding balances.</p>
+                <span className="module-tag tag-ready">
+                  <CheckCircle2 size={12} /> View Invoices <ArrowRight size={12} />
+                </span>
+              </div>
+
               <div className="module-card module-students">
                 <div className="module-icon icon-teal">
                   <Users size={24} />
@@ -135,15 +177,6 @@ export default function Dashboard() {
                 <h4>Financial Analytics</h4>
                 <p>Access total billed, collection rates, and per-grade revenue breakdowns.</p>
                 <span className="module-tag tag-wallet">Ready</span>
-              </div>
-
-              <div className="module-card module-invoices">
-                <div className="module-icon icon-amber">
-                  <Receipt size={24} />
-                </div>
-                <h4>Fee Structures</h4>
-                <p>Configure grade tuition rates and manage monthly invoice schedules.</p>
-                <span className="module-tag tag-invoices">Ready</span>
               </div>
 
               <div className="module-card module-school">

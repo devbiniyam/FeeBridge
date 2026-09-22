@@ -57,8 +57,18 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const refreshProfile = async () => {
+    try {
+      const profile = await authService.getProfile();
+      setUser(profile);
+      return profile;
+    } catch (err) {
+      console.error('Failed to refresh profile:', err);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, setError }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, logout, setError, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

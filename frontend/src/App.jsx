@@ -4,11 +4,13 @@ import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import InvoicesList from './components/InvoicesList';
 import './App.css';
 
 function MainContent() {
   const { user, loading } = useAuth();
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices'
 
   if (loading) {
     return (
@@ -21,10 +23,14 @@ function MainContent() {
 
   return (
     <div className="app-layout">
-      <Navbar />
+      <Navbar currentView={currentView} onSelectView={setCurrentView} />
       <main className="main-content">
         {user ? (
-          <Dashboard />
+          currentView === 'invoices' ? (
+            <InvoicesList onNavigateBack={() => setCurrentView('dashboard')} />
+          ) : (
+            <Dashboard onNavigate={setCurrentView} />
+          )
         ) : (
           <div className="auth-wrapper">
             {authMode === 'login' ? (

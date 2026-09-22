@@ -4,10 +4,15 @@ from accounts.models import User, RoleChoices
 
 class UserSerializer(serializers.ModelSerializer):
     school_name = serializers.ReadOnlyField(source='school.name')
+    wallet_balance = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'role', 'phone_number', 'email', 'school', 'school_name']
+        fields = ['id', 'first_name', 'last_name', 'role', 'phone_number', 'email', 'school', 'school_name', 'wallet_balance']
+
+    def get_wallet_balance(self, obj):
+        wallet = getattr(obj, 'wallet', None)
+        return str(wallet.balance) if wallet else None
 
 
 class RegisterSerializer(serializers.ModelSerializer):
