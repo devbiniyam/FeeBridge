@@ -10,7 +10,12 @@ from api.views.fees import (
     BatchGenerateInvoicesView
 )
 from api.views.payments import PaymentCreateView
-from api.views.wallets import DepositView, WalletPaymentView
+from api.views.wallets import (
+    DepositView,
+    WalletPaymentView,
+    MyWalletView,
+    WalletTransactionListView
+)
 from api.views.notifications import (
     NotificationListCreateView,
     NotificationDetailView,
@@ -47,6 +52,8 @@ urlpatterns = [
     path('payments/checkout/verify/<str:tx_ref>/', CheckoutVerifyView.as_view(), name='checkout-verify'),
     path('payments/webhook/chapa/', ChapaWebhookView.as_view(), name='webhook-chapa'),
     
+    path('wallets/my-wallet/', MyWalletView.as_view(), name='my-wallet'),
+    path('wallets/transactions/', WalletTransactionListView.as_view(), name='wallet-transactions'),
     path('wallets/deposit/', DepositView.as_view(), name='wallet-deposit'),
     path('wallets/pay-invoice/', WalletPaymentView.as_view(), name='wallet-pay-invoice'),
     

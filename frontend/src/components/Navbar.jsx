@@ -1,95 +1,115 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
-  GraduationCap,
-  LogOut,
-  User,
-  Building,
+  Search,
+  Wallet,
+  Bell,
+  PlusCircle,
+  Sparkles,
+  ChevronRight,
   ShieldCheck,
-  LayoutDashboard,
-  Receipt,
-  Wallet
+  Building,
+  User,
+  LogOut,
+  CreditCard
 } from 'lucide-react';
 
-export default function Navbar({ currentView, onSelectView }) {
-  const { user, logout } = useAuth();
+export default function Navbar({
+  currentView,
+  onSelectView,
+  onTriggerDeposit,
+  onTriggerGenerate
+}) {
+  const { user } = useAuth();
+  if (!user) return null;
 
-  const getRoleBadge = (role) => {
-    switch (role) {
-      case 'ADMIN':
-        return <span className="badge badge-admin"><ShieldCheck size={13} /> Admin</span>;
-      case 'STAFF':
-        return <span className="badge badge-staff"><Building size={13} /> Staff</span>;
+  const isParent = user.role === 'PARENT';
+  const walletBalance = parseFloat(user.wallet_balance || 0);
+
+  const getViewTitle = () => {
+    switch (currentView) {
+      case 'wallet':
+        return 'Digital Wallet & Balances';
+      case 'invoices':
+        return isParent ? 'Tuition Invoices' : 'Campus Invoicing & Billing';
       default:
-        return <span className="badge badge-parent"><User size={13} /> Parent</span>;
+        return 'Financial Overview';
     }
   };
 
   return (
-    <header className="navbar">
-      <div className="navbar-brand-section">
-        <div className="navbar-brand" onClick={() => onSelectView && onSelectView('dashboard')} style={{ cursor: 'pointer' }}>
-          <div className="brand-icon">
-            <GraduationCap size={24} />
-          </div>
-          <div className="brand-text">
-            <span className="brand-title">FeeBridge</span>
-            <span className="brand-subtitle">School Fee & Digital Wallet</span>
-          </div>
+    <header className="fintech-topbar">
+      {/* Left: Dynamic Breadcrumb */}
+      <div className="topbar-left">
+        <div className="topbar-breadcrumbs">
+          <span className="crumb-root" onClick={() => onSelectView('dashboard')}>Finance</span>
+          <ChevronRight size={13} className="crumb-sep" />
+          <span className="crumb-active">{getViewTitle()}</span>
         </div>
-
-        {user && (
-          <nav className="nav-links">
-            <button
-              type="button"
-              className={`nav-link-btn ${currentView === 'dashboard' ? 'nav-link-active' : ''}`}
-              onClick={() => onSelectView('dashboard')}
-            >
-              <LayoutDashboard size={15} />
-              <span>Dashboard</span>
-            </button>
-            <button
-              type="button"
-              className={`nav-link-btn ${currentView === 'invoices' ? 'nav-link-active' : ''}`}
-              onClick={() => onSelectView('invoices')}
-            >
-              <Receipt size={15} />
-              <span>Invoices</span>
-            </button>
-          </nav>
-        )}
       </div>
 
-      {user && (
-        <div className="navbar-user">
-          {user.role === 'PARENT' && user.wallet_balance !== undefined && (
-            <div className="nav-wallet-pill" title="Current Digital Wallet Balance">
-              <Wallet size={14} className="nav-wallet-icon" />
-              <div className="nav-wallet-texts">
-                <span className="nav-wallet-label">Wallet</span>
-                <strong className="nav-wallet-amount">{parseFloat(user.wallet_balance).toFixed(2)} ETB</strong>
-              </div>
-            </div>
-          )}
-
-          <div className="user-details">
-            <div className="user-name-row">
-              <span className="user-name">{user.first_name} {user.last_name}</span>
-              {getRoleBadge(user.role)}
-            </div>
-            <div className="user-subtext">
-              <span className="user-email">{user.email}</span>
-              {user.school_name && (
-                <span className="user-school">• {user.school_name}</span>
-              )}
-            </div>
-          </div>
-          <button onClick={logout} className="btn-logout" title="Log Out">
-            <LogOut size={16} />
-            <span>Log Out</span>
-          </button>
+      {/* Center: Global Search Bar */}
+      <div className="topbar-center">
+        <div className="fintech-search-box">
+          <Search size={15} className="fintech-search-icon" />
+          <input
+            type="text"
+            placeholder="Search invoices, receipts, student ID, references..."
+            className="fintech-search-input"
+          />
+          <span className="search-shortcut">⌘K</span>
         </div>
-      )}
+      </div>
+
+      {/* Right: Quick Action + Live Wallet Pill + Notifications */}
+      <div className="topbar-right">
+        {/* Quick Action Button */}
+        {isParent ? (
+          <button
+            type="button"
+            className="btn-topbar-action"
+            onClick={onTriggerDeposit || (() => onSelectView('wallet'))}
+          >
+            <PlusCircle size={15} />
+            <span>Deposit Funds</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn-topbar-action btn-topbar-staff"
+            onClick={onTriggerGenerate || (() => onSelectView('invoices'))}
+          >
+            <Sparkles size={15} />
+            <span>Generate Invoices</span>
+          </button>
+        )}
+
+        {/* Live Wallet Chip (for parent) */}
+        {isParent && (
+          <button
+            type="button"
+            className="topbar-wallet-chip"
+            onClick={() => onSelectView('wallet')}
+            title="View Digital Wallet & Statement"
+          >
+            <div className="wallet-chip-icon">
+              <Wallet size={14} />
+            </div>
+            <div className="wallet-chip-content">
+              <span className="wallet-chip-label">BALANCE</span>
+              <strong className="wallet-chip-val">
+                {walletBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB
+              </strong>
+            </div>
+          </button>
+        )}
+
+        {/* Notification Bell */}
+        <div className="topbar-bell-btn" title="Notifications">
+          <Bell size={18} />
+          <span className="bell-badge-dot"></span>
+        </div>
+      </div>
     </header>
   );
 }

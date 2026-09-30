@@ -143,6 +143,27 @@ export const paymentService = {
     return res.json();
   },
 
+  async payDirect(invoiceId, amount, method = 'CBE', fundingSource = '', sourceAccount = '', referenceNumber = '') {
+    const payload = {
+      invoice: invoiceId,
+      amount: amount,
+      method: method,
+      funding_source: fundingSource || method,
+      source_account: sourceAccount,
+      reference_number: referenceNumber,
+    };
+    const res = await apiRequest('/payments/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Payment failed.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Payment failed.');
+    }
+    return res.json();
+  },
+
   async initializeCheckout(invoiceId, amount) {
     const payload = {
       purpose: 'INVOICE_PAYMENT',
@@ -169,4 +190,58 @@ export const paymentService = {
     return res.json();
   },
 };
+
+export const walletService = {
+  async getMyWallet() {
+    const res = await apiRequest('/wallets/my-wallet/');
+    if (!res.ok) {
+      throw new Error('Failed to load wallet details.');
+    }
+    return res.json();
+  },
+
+  async getTransactions() {
+    const res = await apiRequest('/wallets/transactions/');
+    if (!res.ok) {
+      throw new Error('Failed to load wallet transactions.');
+    }
+    return res.json();
+  },
+
+  async deposit(amount, fundingSource = 'CBE', sourceAccount = '', referenceNumber = '') {
+    const res = await apiRequest('/wallets/deposit/', {
+      method: 'POST',
+      body: JSON.stringify({
+        amount,
+        funding_source: fundingSource,
+        source_account: sourceAccount,
+        reference_number: referenceNumber,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Deposit failed.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Deposit failed.');
+    }
+    return res.json();
+  },
+
+  async initializeDepositCheckout(amount) {
+    const res = await apiRequest('/payments/checkout/initialize/', {
+      method: 'POST',
+      body: JSON.stringify({
+        purpose: 'WALLET_DEPOSIT',
+        amount: amount,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Deposit checkout failed.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Checkout failed.');
+    }
+    return res.json();
+  },
+};
+
+
 

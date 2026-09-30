@@ -27,10 +27,16 @@ class PaymentSerializer(serializers.ModelSerializer):
         invoice = validated_data['invoice']
         amount = validated_data['amount']
         method = validated_data.get('method', PaymentChoices.DIRECT)
+        funding_source = validated_data.get('funding_source') or str(method)
+        source_account = validated_data.get('source_account', '')
+        reference_number = validated_data.get('reference_number', '')
 
         return process_payment(
             invoice=invoice,
             paid_by=user,
             amount=amount,
-            method=method
-        )
+            method=method,
+            funding_source=funding_source,
+            source_account=source_account,
+            reference_number=reference_number
+        )

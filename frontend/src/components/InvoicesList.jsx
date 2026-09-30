@@ -19,7 +19,11 @@ import {
   TrendingUp,
   RotateCcw,
   Sparkles,
-  Plus
+  Plus,
+  ArrowRight,
+  Filter,
+  Check,
+  ChevronDown
 } from 'lucide-react';
 
 export default function InvoicesList({ onNavigateBack }) {
@@ -49,7 +53,6 @@ export default function InvoicesList({ onNavigateBack }) {
     fetchInvoices();
   }, []);
 
-  // Filter invoices based on status tab and search query
   const filteredInvoices = invoices.filter((inv) => {
     const matchesTab =
       activeTab === 'ALL' ||
@@ -62,10 +65,10 @@ export default function InvoicesList({ onNavigateBack }) {
     return matchesTab && (searchQuery === '' || studentMatch || schoolMatch || monthMatch);
   });
 
-  // Calculate high-level financial summary
   const totalBilled = invoices.reduce((sum, inv) => sum + parseFloat(inv.amount || 0), 0);
   const totalPaid = invoices.reduce((sum, inv) => sum + parseFloat(inv.amount_paid || 0), 0);
   const totalOutstanding = invoices.reduce((sum, inv) => sum + parseFloat(inv.balance_remaining || 0), 0);
+  const collectionRate = totalBilled > 0 ? Math.round((totalPaid / totalBilled) * 100) : 0;
 
   const unpaidCount = invoices.filter((i) => i.status === 'UNPAID').length;
   const partialCount = invoices.filter((i) => i.status === 'PARTIALLY_PAID').length;
@@ -77,168 +80,150 @@ export default function InvoicesList({ onNavigateBack }) {
     switch (status) {
       case 'PAID':
         return (
-          <span className="status-badge status-paid">
-            <CheckCircle2 size={13} /> Fully Paid
+          <span className="status-pill status-paid">
+            <CheckCircle2 size={12} /> Cleared
           </span>
         );
       case 'PARTIALLY_PAID':
         return (
-          <span className="status-badge status-partial">
-            <Clock size={13} /> Partially Paid
+          <span className="status-pill status-partial">
+            <Clock size={12} /> Partially Paid
           </span>
         );
       case 'OVERDUE':
         return (
-          <span className="status-badge status-overdue">
-            <AlertCircle size={13} /> Overdue
+          <span className="status-pill status-overdue">
+            <AlertCircle size={12} /> Overdue
           </span>
         );
       default:
         return (
-          <span className="status-badge status-unpaid">
-            <AlertCircle size={13} /> Unpaid
+          <span className="status-pill status-unpaid">
+            <AlertCircle size={12} /> Unpaid
           </span>
         );
     }
   };
 
   return (
-    <div className="invoices-page">
-      {/* Top Breadcrumb & Actions */}
-      <div className="page-header-row">
-        <button type="button" className="btn-back" onClick={onNavigateBack}>
-          <ArrowLeft size={16} />
-          <span>Back to Dashboard</span>
-        </button>
+    <div className="fintech-invoices-container">
+      {/* Top Breadcrumb & Controls */}
+      <div className="invoices-topbar-row">
+        <div>
+          <h2 className="fintech-page-title">
+            {isParent ? 'Tuition Billing & Invoices' : 'Campus Invoicing Management'}
+          </h2>
+          <p className="fintech-page-sub">
+            {isParent
+              ? 'Review active school fee schedules, verify payment allocations, and clear tuition online.'
+              : `Institutional fee collection console for ${user?.school_name || 'campus'}.`}
+          </p>
+        </div>
 
-        <div className="page-actions-group">
+        <div className="invoices-header-actions">
           {!isParent && (
             <button
               type="button"
-              className="btn-generate-invoices"
+              className="btn-fintech-primary"
               onClick={() => setIsGenerateModalOpen(true)}
             >
-              <Sparkles size={16} />
-              <span>Generate Monthly Invoices</span>
+              <Sparkles size={16} /> Run Monthly Billing
             </button>
           )}
 
-          <button type="button" className="btn-refresh" onClick={fetchInvoices} title="Reload Invoices">
-            <RotateCcw size={15} />
-            <span>Refresh</span>
+          <button type="button" className="btn-fintech-ghost" onClick={fetchInvoices} title="Reload Data">
+            <RotateCcw size={15} /> Refresh
           </button>
         </div>
       </div>
 
-      <div className="invoices-header-banner">
-        <div className="header-text-group">
-          <div className="header-tag">
-            <Receipt size={14} /> Fee Invoicing Hub
+      {/* Financial Pipeline KPI Bar */}
+      <div className="pipeline-kpi-bar">
+        <div className="kpi-segment">
+          <span className="kpi-label">TOTAL INVOICED</span>
+          <strong className="kpi-value">{totalBilled.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</strong>
+          <span className="kpi-sub">{invoices.length} invoices generated</span>
+        </div>
+
+        <div className="kpi-divider"></div>
+
+        <div className="kpi-segment">
+          <span className="kpi-label">TOTAL COLLECTED</span>
+          <strong className="kpi-value text-emerald">{totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</strong>
+          <span className="kpi-sub">{paidCount} invoices cleared</span>
+        </div>
+
+        <div className="kpi-divider"></div>
+
+        <div className="kpi-segment">
+          <span className="kpi-label">OUTSTANDING DUE</span>
+          <strong className="kpi-value text-amber">{totalOutstanding.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</strong>
+          <span className="kpi-sub">{unpaidCount + partialCount} pending payments</span>
+        </div>
+
+        <div className="kpi-divider"></div>
+
+        <div className="kpi-segment kpi-progress-segment">
+          <div className="kpi-progress-header">
+            <span className="kpi-label">COLLECTION RATE</span>
+            <strong className="kpi-rate-text">{collectionRate}%</strong>
           </div>
-          <h2>School Fee Invoices</h2>
-          <p>
-            {isParent
-              ? 'Review monthly tuition schedules, check remaining balances, and settle fees via Digital Wallet or Telebirr.'
-              : `Campus Invoicing Oversight for ${user?.school_name || 'your institution'}. Run monthly billing runs and track collection rates.`}
-          </p>
-        </div>
-
-        {isParent && user?.wallet_balance !== undefined ? (
-          <div className="quick-wallet-pill">
-            <Wallet size={18} className="text-emerald" />
-            <div>
-              <span className="pill-label">Wallet Available</span>
-              <strong className="pill-balance">{parseFloat(user.wallet_balance).toFixed(2)} ETB</strong>
-            </div>
+          <div className="kpi-progress-track">
+            <div className="kpi-progress-fill" style={{ width: `${collectionRate}%` }}></div>
           </div>
-        ) : (
-          !isParent && (
-            <button
-              type="button"
-              className="btn-banner-generate"
-              onClick={() => setIsGenerateModalOpen(true)}
-            >
-              <Building size={20} />
-              <div className="btn-banner-texts">
-                <span className="btn-banner-sub">Staff Billing Engine</span>
-                <strong>Run Monthly Invoicing</strong>
-              </div>
-            </button>
-          )
-        )}
-      </div>
-
-      {/* Financial Summary Cards */}
-      <div className="stats-summary-grid">
-        <div className="stat-card stat-billed">
-          <div className="stat-label">Total Invoiced</div>
-          <div className="stat-value">{totalBilled.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</div>
-          <div className="stat-sub">{invoices.length} total invoice records</div>
-        </div>
-
-        <div className="stat-card stat-paid">
-          <div className="stat-label">Total Collected / Paid</div>
-          <div className="stat-value text-emerald">{totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</div>
-          <div className="stat-sub">{paidCount} cleared invoices</div>
-        </div>
-
-        <div className="stat-card stat-due">
-          <div className="stat-label">Outstanding Balance</div>
-          <div className="stat-value text-amber">{totalOutstanding.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</div>
-          <div className="stat-sub">{unpaidCount + partialCount} pending payments</div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="filter-controls-card">
-        <div className="tabs-row">
+      <div className="ledger-filter-controls">
+        <div className="ledger-tabs-group">
           <button
             type="button"
-            className={`tab-btn ${activeTab === 'ALL' ? 'tab-active' : ''}`}
+            className={`ledger-tab ${activeTab === 'ALL' ? 'ledger-tab-active' : ''}`}
             onClick={() => setActiveTab('ALL')}
           >
-            All Invoices <span className="tab-counter">{invoices.length}</span>
+            All Invoices ({invoices.length})
           </button>
           <button
             type="button"
-            className={`tab-btn ${activeTab === 'UNPAID' ? 'tab-active' : ''}`}
+            className={`ledger-tab ${activeTab === 'UNPAID' ? 'ledger-tab-active' : ''}`}
             onClick={() => setActiveTab('UNPAID')}
           >
-            Unpaid <span className="tab-counter count-unpaid">{unpaidCount}</span>
+            Unpaid ({unpaidCount})
           </button>
           <button
             type="button"
-            className={`tab-btn ${activeTab === 'PARTIALLY_PAID' ? 'tab-active' : ''}`}
+            className={`ledger-tab ${activeTab === 'PARTIALLY_PAID' ? 'ledger-tab-active' : ''}`}
             onClick={() => setActiveTab('PARTIALLY_PAID')}
           >
-            Partially Paid <span className="tab-counter count-partial">{partialCount}</span>
+            Partially Paid ({partialCount})
           </button>
           <button
             type="button"
-            className={`tab-btn ${activeTab === 'PAID' ? 'tab-active' : ''}`}
+            className={`ledger-tab ${activeTab === 'PAID' ? 'ledger-tab-active' : ''}`}
             onClick={() => setActiveTab('PAID')}
           >
-            Paid <span className="tab-counter count-paid">{paidCount}</span>
+            Cleared / Paid ({paidCount})
           </button>
         </div>
 
-        <div className="search-wrapper">
-          <Search size={17} className="search-icon" />
+        <div className="fintech-search-box search-inline">
+          <Search size={15} className="fintech-search-icon" />
           <input
             type="text"
-            placeholder="Search student, grade, or month..."
+            placeholder="Filter by student name, grade, month..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
+            className="fintech-search-input"
           />
         </div>
       </div>
 
-      {/* Invoices List Display */}
+      {/* Invoices Table */}
       {loading ? (
         <div className="loading-state">
           <div className="spinner-large"></div>
-          <p>Fetching invoices...</p>
+          <p>Loading invoice records...</p>
         </div>
       ) : error ? (
         <div className="alert-error">
@@ -246,137 +231,155 @@ export default function InvoicesList({ onNavigateBack }) {
           <span>{error}</span>
         </div>
       ) : filteredInvoices.length === 0 ? (
-        <div className="empty-state-card">
-          <Receipt size={48} className="empty-icon" />
-          <h3>No Invoices Found</h3>
+        <div className="empty-ledger-state">
+          <Receipt size={44} className="text-muted" />
+          <h4>No Invoices Found</h4>
           <p>
             {searchQuery
-              ? `No invoices matched "${searchQuery}". Try adjusting your search term.`
+              ? `No invoices matched "${searchQuery}".`
               : !isParent
-              ? 'No invoices found for this period. Click "Generate Monthly Invoices" to create billing records for enrolled students.'
-              : 'There are no invoices currently registered under this category.'}
+              ? 'No invoices generated yet. Click "Run Monthly Billing" to issue tuition fees.'
+              : 'There are no invoices in this category.'}
           </p>
           {!isParent && (
             <button
               type="button"
-              className="btn-primary"
+              className="btn-fintech-primary"
               style={{ marginTop: '0.5rem' }}
               onClick={() => setIsGenerateModalOpen(true)}
             >
-              <Sparkles size={16} /> Generate Invoices Now
+              <Sparkles size={15} /> Run Monthly Billing
             </button>
           )}
         </div>
       ) : (
-        <div className="invoices-grid">
-          {filteredInvoices.map((inv) => {
-            const amount = parseFloat(inv.amount || 0);
-            const amountPaid = parseFloat(inv.amount_paid || 0);
-            const balanceRemaining = parseFloat(inv.balance_remaining || 0);
-            const percentage = amount > 0 ? Math.min(100, Math.round((amountPaid / amount) * 100)) : 0;
-            const isFullyPaid = inv.status === 'PAID' || balanceRemaining <= 0;
+        <div className="fintech-ledger-card">
+          <div className="table-responsive">
+            <table className="fintech-table">
+              <thead>
+                <tr>
+                  <th>INVOICE</th>
+                  <th>STUDENT & CAMPUS</th>
+                  <th>BILLING PERIOD</th>
+                  <th>DUE DATE</th>
+                  <th>STATUS</th>
+                  <th>PAYMENT PROGRESS</th>
+                  <th style={{ textAlign: 'right' }}>BALANCE DUE</th>
+                  <th style={{ textAlign: 'center' }}>ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredInvoices.map((inv) => {
+                  const amount = parseFloat(inv.amount || 0);
+                  const amountPaid = parseFloat(inv.amount_paid || 0);
+                  const balanceRemaining = parseFloat(inv.balance_remaining || 0);
+                  const percentage = amount > 0 ? Math.min(100, Math.round((amountPaid / amount) * 100)) : 0;
+                  const isFullyPaid = inv.status === 'PAID' || balanceRemaining <= 0;
 
-            return (
-              <div key={inv.id} className={`invoice-card invoice-card-${inv.status.toLowerCase()}`}>
-                {/* Invoice Card Top Header */}
-                <div className="inv-top">
-                  <div className="student-profile-badge">
-                    <div className="student-avatar">
-                      <GraduationCap size={18} />
-                    </div>
-                    <div>
-                      <h4 className="student-name">{inv.student_name || `Student #${inv.student}`}</h4>
-                      <div className="student-meta">
-                        <span>Grade {inv.student_grade || 'N/A'}-{inv.student_section || 'A'}</span>
-                        {inv.school_name && (
-                          <span className="school-pill">
-                            <Building size={11} /> {inv.school_name}
+                  return (
+                    <tr key={inv.id} className="ledger-row">
+                      {/* Invoice ID */}
+                      <td>
+                        <div className="inv-code-cell">
+                          <code className="reference-code">
+                            INV-{(inv.id).toString().padStart(5, '0')}
+                          </code>
+                        </div>
+                      </td>
+
+                      {/* Student & School */}
+                      <td>
+                        <div className="student-cell-group">
+                          <strong className="student-cell-name">
+                            {inv.student_name || `Student #${inv.student}`}
+                          </strong>
+                          <div className="student-cell-tags">
+                            <span className="badge-grade">Grade {inv.student_grade || 'N/A'}-{inv.student_section || 'A'}</span>
+                            {inv.school_name && (
+                              <span className="school-sub-tag">
+                                <Building size={11} /> {inv.school_name}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Billing Period */}
+                      <td>
+                        <div className="date-cell">
+                          <span className="period-text">
+                            {new Date(inv.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Due Date */}
+                      <td>
+                        <div className="date-cell">
+                          <span>{new Date(inv.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                      </td>
+
+                      {/* Status */}
+                      <td>
+                        {getStatusBadge(inv.status)}
+                      </td>
+
+                      {/* Payment Progress */}
+                      <td>
+                        <div className="progress-cell-group">
+                          <div className="progress-bar-small">
+                            <div
+                              className={`progress-fill ${isFullyPaid ? 'fill-emerald' : 'fill-amber'}`}
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                          <span className="progress-text">{percentage}% ({amountPaid.toFixed(0)} / {amount.toFixed(0)} ETB)</span>
+                        </div>
+                      </td>
+
+                      {/* Balance Due */}
+                      <td style={{ textAlign: 'right' }}>
+                        <div className="amount-cell-group">
+                          <strong className={`balance-num ${isFullyPaid ? 'text-muted' : 'text-amber'}`}>
+                            {balanceRemaining.toFixed(2)} ETB
+                          </strong>
+                          <span className="total-fee-sub">Total: {amount.toFixed(2)} ETB</span>
+                        </div>
+                      </td>
+
+                      {/* Action */}
+                      <td style={{ textAlign: 'center' }}>
+                        {isParent ? (
+                          isFullyPaid ? (
+                            <span className="paid-check-tag">
+                              <CheckCircle2 size={14} /> Settled
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn-table-pay"
+                              onClick={() => setSelectedInvoice(inv)}
+                            >
+                              <CreditCard size={14} /> Pay Now
+                            </button>
+                          )
+                        ) : (
+                          <span className="staff-view-pill">
+                            Active
                           </span>
                         )}
-                      </div>
-                    </div>
-                  </div>
-                  <div>{getStatusBadge(inv.status)}</div>
-                </div>
-
-                {/* Billing Month & Dates */}
-                <div className="inv-dates-row">
-                  <div className="date-item">
-                    <Calendar size={14} />
-                    <span>
-                      Month:{' '}
-                      <strong>
-                        {new Date(inv.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                      </strong>
-                    </span>
-                  </div>
-                  <div className="date-item">
-                    <Clock size={14} />
-                    <span>
-                      Due: <strong>{new Date(inv.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="progress-section">
-                  <div className="progress-labels">
-                    <span>Payment Progress</span>
-                    <strong>{percentage}% Paid</strong>
-                  </div>
-                  <div className="progress-track">
-                    <div
-                      className={`progress-fill ${isFullyPaid ? 'fill-emerald' : 'fill-amber'}`}
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Fee Figures */}
-                <div className="inv-amounts-grid">
-                  <div className="amount-col">
-                    <span className="amt-label">Total Fee</span>
-                    <span className="amt-val">{amount.toFixed(2)} ETB</span>
-                  </div>
-                  <div className="amount-col">
-                    <span className="amt-label">Paid So Far</span>
-                    <span className="amt-val text-emerald">{amountPaid.toFixed(2)} ETB</span>
-                  </div>
-                  <div className="amount-col highlight-due">
-                    <span className="amt-label">Balance Remaining</span>
-                    <span className="amt-val due-val">{balanceRemaining.toFixed(2)} ETB</span>
-                  </div>
-                </div>
-
-                {/* Card Action */}
-                <div className="inv-card-footer">
-                  {isParent ? (
-                    isFullyPaid ? (
-                      <div className="paid-tag-pill">
-                        <CheckCircle2 size={16} /> Cleared • No Balance Due
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        className="btn-primary btn-pay-card"
-                        onClick={() => setSelectedInvoice(inv)}
-                      >
-                        <CreditCard size={16} /> Pay Invoice
-                      </button>
-                    )
-                  ) : (
-                    <div className="staff-info-tag">
-                      Invoice #{inv.id} • {inv.status}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* Payment Modal for Parents */}
+      {/* Settle Invoice Modal */}
       {selectedInvoice && (
         <PaymentModal
           invoice={selectedInvoice}
@@ -387,7 +390,7 @@ export default function InvoicesList({ onNavigateBack }) {
         />
       )}
 
-      {/* Generate Invoices Modal for Staff/Admin */}
+      {/* Staff Batch Invoice Generator Modal */}
       {isGenerateModalOpen && (
         <GenerateInvoicesModal
           onClose={() => setIsGenerateModalOpen(false)}

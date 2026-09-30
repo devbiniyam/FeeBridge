@@ -2,10 +2,16 @@ from django.db import models
 from fees.models import Invoice
 from accounts.models import User
 class PaymentChoices(models.TextChoices):
-    DIRECT = "DIRECT", "Direct"
-    WALLET = "WALLET", "Wallet"
-    CHAPA = "CHAPA", "Chapa"
+    DIRECT = "DIRECT", "Direct Bank Transfer"
+    WALLET = "WALLET", "Digital Wallet"
+    CBE = "CBE", "Commercial Bank of Ethiopia (CBE)"
     TELEBIRR = "TELEBIRR", "Telebirr"
+    BOA = "BOA", "Bank of Abyssinia (BoA)"
+    AWASH = "AWASH", "Awash Bank"
+    DASHEN = "DASHEN", "Dashen Bank"
+    COOP = "COOP", "Cooperative Bank of Oromia"
+    CARD = "CARD", "Debit/Credit Card (Visa/Mastercard)"
+    CHAPA = "CHAPA", "Chapa Online Gateway"
 
 
 class GatewayChoices(models.TextChoices):
@@ -29,10 +35,14 @@ class Payment(models.Model):
     paid_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payments")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     method = models.CharField(max_length=50, choices=PaymentChoices.choices, default=PaymentChoices.DIRECT)
+    funding_source = models.CharField(max_length=50, blank=True, default="DIRECT")
+    source_account = models.CharField(max_length=100, blank=True, default="")
+    reference_number = models.CharField(max_length=100, blank=True, default="")
     paid_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.invoice} - {self.paid_by} - {self.amount}"
+        return f"{self.invoice} - {self.paid_by} - {self.amount} ETB ({self.method})"
+
     
 
 class Receipt(models.Model):

@@ -8,12 +8,13 @@ from wallets.models import Wallet, WalletTransaction, TransactionChoices
 
 
 @transaction.atomic
-def process_payment(invoice, paid_by, amount, method=PaymentChoices.DIRECT, wallet=None):
+def process_payment(invoice, paid_by, amount, method=PaymentChoices.DIRECT, wallet=None, funding_source="", source_account="", reference_number=""):
     """
     Process an invoice payment atomically.
     Supports full and partial payments, updates invoice balance/status,
     deducts from wallet with row-locking if paying via wallet, and generates a receipt.
     """
+    import uuid
     amount = Decimal(str(amount))
 
     if amount <= Decimal('0.00'):
@@ -50,16 +51,27 @@ def process_payment(invoice, paid_by, amount, method=PaymentChoices.DIRECT, wall
             wallet=locked_wallet,
             transaction_type=TransactionChoices.DEDUCTION,
             amount=amount,
-            related_invoice=invoice
+            related_invoice=invoice,
+            funding_source="WALLET",
+            source_account=f"Wallet #{locked_wallet.id}",
+            reference_number=f"DED-{uuid.uuid4().hex[:8].upper()}"
         )
+
+    if not reference_number:
+        prefix = (funding_source or str(method)).upper()
+        reference_number = f"{prefix}-{uuid.uuid4().hex[:8].upper()}"
 
     # Create Payment record
     payment = Payment.objects.create(
         invoice=invoice,
         paid_by=paid_by,
         amount=amount,
-        method=method
+        method=method,
+        funding_source=funding_source or str(method),
+        source_account=source_account,
+        reference_number=reference_number
     )
+
 
     # Update invoice paid balance and status
     invoice.amount_paid += amount
@@ -121,8 +133,12 @@ def fulfill_gateway_transaction(gateway_transaction, gateway_reference=None):
         WalletTransaction.objects.create(
             wallet=locked_wallet,
             transaction_type=TransactionChoices.DEPOSIT,
-            amount=tx.amount
+            amount=tx.amount,
+            funding_source="CHAPA",
+            source_account=getattr(tx.user, 'phone_number', '') or tx.user.email,
+            reference_number=gateway_reference or tx.tx_ref
         )
+
 
     tx.status = GatewayTransactionStatus.SUCCESS
     if gateway_reference:
