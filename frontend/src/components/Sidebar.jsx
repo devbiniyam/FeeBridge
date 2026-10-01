@@ -121,15 +121,19 @@ export default function Sidebar({ currentView, onSelectView, unreadCount = 0 }) 
           </button>
 
 
-          {!isParent && (
-            <div className="sidebar-nav-item nav-item-disabled" title="Tuition Rates per Grade">
-              <div className="nav-item-icon">
-                <CreditCard size={18} />
-              </div>
-              <span className="nav-item-label">Fee Structures</span>
-              <span className="nav-badge-subtle">Multi-Tenant</span>
+          <button
+            type="button"
+            className={`sidebar-nav-item ${currentView === 'fees' ? 'nav-item-active' : ''}`}
+            onClick={() => onSelectView('fees')}
+            title={isParent ? 'Approved Campus Tuition Rates' : 'Campus Tuition Rates per Grade'}
+          >
+            <div className="nav-item-icon icon-indigo-tint">
+              <CreditCard size={18} />
             </div>
-          )}
+            <span className="nav-item-label">{isParent ? 'Tuition Schedule' : 'Fee Structures'}</span>
+            <span className="nav-badge-subtle">{isParent ? 'Rates' : 'Grades'}</span>
+            {currentView === 'fees' && <div className="nav-active-pill" />}
+          </button>
         </div>
 
         {/* Section 3: System */}

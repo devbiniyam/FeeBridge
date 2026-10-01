@@ -9,6 +9,7 @@ import InvoicesList from './components/InvoicesList';
 import WalletView from './components/WalletView';
 import StudentsView from './components/StudentsView';
 import NotificationsView from './components/NotificationsView';
+import FeeStructuresView from './components/FeeStructuresView';
 import WalletDepositModal from './components/WalletDepositModal';
 import GenerateInvoicesModal from './components/GenerateInvoicesModal';
 import { notificationService } from './services/api';
@@ -114,6 +115,12 @@ function MainContent() {
               onNavigateToInvoices={() => {
                 setCurrentView('invoices');
               }}
+            />
+          ) : currentView === 'fees' ? (
+            <FeeStructuresView
+              onNavigateBack={() => setCurrentView('dashboard')}
+              onNavigateToGenerate={() => setIsGenerateModalOpen(true)}
+              onNavigateToInvoices={() => setCurrentView('invoices')}
             />
           ) : (
             <Dashboard

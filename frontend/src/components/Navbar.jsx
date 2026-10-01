@@ -50,6 +50,8 @@ export default function Navbar({
         return isParent ? 'Tuition Invoices' : 'Campus Invoicing & Billing';
       case 'notifications':
         return 'Notifications & Alerts Hub';
+      case 'fees':
+        return isParent ? 'Official Tuition Schedule' : 'Campus Fee Structures & Multi-Grade Pricing';
       default:
         return 'Financial Overview';
     }

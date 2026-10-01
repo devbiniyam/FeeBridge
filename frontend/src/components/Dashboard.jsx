@@ -458,19 +458,24 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               </div>
 
 
-              {/* Multi-Tenant Governance */}
-              <div className="fintech-module-box box-school">
+              {/* Campus Fee Structures & Multi-Grade Pricing */}
+              <div
+                className="fintech-module-box box-fees"
+                onClick={() => onNavigate('fees')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="module-box-top">
                   <div className="module-bubble bubble-purple">
-                    <Building size={22} />
+                    <CreditCard size={22} />
                   </div>
-                  <span className="module-status-chip chip-purple">Isolated</span>
+                  <span className="module-status-chip chip-purple">Multi-Grade</span>
                 </div>
-                <h4>Campus Tenant Governance</h4>
-                <p>Institutional security isolation ensuring student balances and invoices are segregated per school.</p>
+                <h4>Fee Structures & Pricing</h4>
+                <p>Configure monthly tuition rates across Grade 1 to 12. Rates automatically drive batch invoice generation.</p>
                 <div className="module-box-footer">
                   <span className="module-action-link">
-                    Tenant Settings <ChevronRight size={14} />
+                    Manage Grade Rates <ChevronRight size={14} />
                   </span>
                 </div>
               </div>

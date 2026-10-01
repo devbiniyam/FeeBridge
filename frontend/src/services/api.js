@@ -372,3 +372,50 @@ export const notificationService = {
     return res.json();
   },
 };
+
+export const feeStructureService = {
+  async getFeeStructures() {
+    const res = await apiRequest('/fee-structures/');
+    if (!res.ok) {
+      throw new Error('Failed to load fee structures.');
+    }
+    return res.json();
+  },
+
+  async createFeeStructure(data) {
+    const res = await apiRequest('/fee-structures/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to create fee structure.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to create fee structure.');
+    }
+    return res.json();
+  },
+
+  async updateFeeStructure(id, data) {
+    const res = await apiRequest(`/fee-structures/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to update fee structure.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to update fee structure.');
+    }
+    return res.json();
+  },
+
+  async deleteFeeStructure(id) {
+    const res = await apiRequest(`/fee-structures/${id}/`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      throw new Error('Failed to delete fee structure.');
+    }
+    return true;
+  },
+};
+

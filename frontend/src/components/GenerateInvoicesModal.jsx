@@ -227,10 +227,11 @@ export default function GenerateInvoicesModal({ onClose, onSuccess }) {
                     style={{ paddingLeft: '2.5rem' }}
                   >
                     <option value="">All Grades (Campus Wide)</option>
-                    <option value="9">Grade 9</option>
-                    <option value="10">Grade 10</option>
-                    <option value="11">Grade 11</option>
-                    <option value="12">Grade 12</option>
+                    {[...Array(12).keys()].map((i) => (
+                      <option key={i + 1} value={i + 1}>
+                        Grade {i + 1}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

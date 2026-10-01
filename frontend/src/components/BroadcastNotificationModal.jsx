@@ -65,16 +65,16 @@ export default function BroadcastNotificationModal({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="modal-backdrop-fintech" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose}>
       <div
-        className="modal-box-fintech broadcast-modal"
+        className="modal-dialog modal-dialog-fintech broadcast-modal"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="modal-header-fintech">
-          <div className="modal-title-with-icon">
-            <div className="modal-icon-badge modal-icon-broadcast">
-              <Megaphone size={20} />
+        <div className="modal-header">
+          <div className="modal-title-row">
+            <div className="modal-icon-badge icon-indigo">
+              <Megaphone size={22} />
             </div>
             <div>
               <h3>Campus Broadcast & Announcements</h3>
@@ -85,20 +85,21 @@ export default function BroadcastNotificationModal({ onClose, onSuccess }) {
           </div>
           <button
             type="button"
-            className="btn-modal-close"
+            className="btn-close"
             onClick={onClose}
             aria-label="Close"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        {error && (
-          <div className="modal-error-banner">
-            <AlertCircle size={16} />
-            <span>{error}</span>
-          </div>
-        )}
+        <div className="modal-body">
+          {error && (
+            <div className="modal-error-banner" style={{ marginBottom: '1rem' }}>
+              <AlertCircle size={16} />
+              <span>{error}</span>
+            </div>
+          )}
 
         {successResult && (
           <div className="modal-success-banner">
@@ -307,6 +308,7 @@ export default function BroadcastNotificationModal({ onClose, onSuccess }) {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

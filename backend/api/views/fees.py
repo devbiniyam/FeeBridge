@@ -12,13 +12,20 @@ from notifications.services import send_due_reminder
 
 class FeeStructureListCreateView(ListCreateAPIView):
     serializer_class = FeeStructureSerializer
-    permission_classes = [IsStaffOrAdmin]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsStaffOrAdmin()]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         user = self.request.user
+        if user.role == 'PARENT':
+            school_ids = Student.objects.filter(parent=user).values_list('school_id', flat=True).distinct()
+            return FeeStructure.objects.filter(school_id__in=school_ids).order_by('grade')
         if user.role == 'STAFF' and user.school:
-            return FeeStructure.objects.filter(school=user.school)
-        return FeeStructure.objects.all()
+            return FeeStructure.objects.filter(school=user.school).order_by('grade')
+        return FeeStructure.objects.all().order_by('grade')
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -32,12 +39,17 @@ class FeeStructureDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = FeeStructureSerializer
 
     def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return [IsStaffOrAdmin()]
         if self.request.method == 'DELETE':
             return [IsAdmin()]
-        return [IsStaffOrAdmin()]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         user = self.request.user
+        if user.role == 'PARENT':
+            school_ids = Student.objects.filter(parent=user).values_list('school_id', flat=True).distinct()
+            return FeeStructure.objects.filter(school_id__in=school_ids)
         if user.role == 'STAFF' and user.school:
             return FeeStructure.objects.filter(school=user.school)
         return FeeStructure.objects.all()

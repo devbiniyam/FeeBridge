@@ -1,11 +1,78 @@
+from decimal import Decimal
 from rest_framework import serializers
 from fees.models import FeeStructure, Invoice
+from schools.models import School
+
 
 class FeeStructureSerializer(serializers.ModelSerializer):
+    school = serializers.PrimaryKeyRelatedField(
+        queryset=School.objects.all(),
+        required=False
+    )
+    school_name = serializers.ReadOnlyField(source='school.name')
+    grade_display = serializers.SerializerMethodField()
+    student_count = serializers.SerializerMethodField()
+    annual_estimate = serializers.SerializerMethodField()
+
     class Meta:
         model = FeeStructure
-        fields = '__all__'
-      
+        fields = [
+            'id',
+            'school',
+            'school_name',
+            'grade',
+            'grade_display',
+            'amount',
+            'student_count',
+            'annual_estimate',
+        ]
+
+    def to_internal_value(self, data):
+        data = data.copy() if hasattr(data, 'copy') else dict(data)
+        request = self.context.get('request')
+        if 'school' not in data and request and hasattr(request.user, 'school') and request.user.school:
+            data['school'] = request.user.school.id
+        return super().to_internal_value(data)
+
+    def get_grade_display(self, obj):
+        return f"Grade {obj.grade}"
+
+    def get_student_count(self, obj):
+        if not obj.school:
+            return 0
+        return obj.school.students.filter(grade=obj.grade, status='ACTIVE').count()
+
+    def get_annual_estimate(self, obj):
+        # 10 academic months per Ethiopian school year
+        return str(Decimal(obj.amount) * 10)
+
+    def validate_grade(self, value):
+        if value < 1 or value > 12:
+            raise serializers.ValidationError("Grade must be between 1 and 12.")
+        return value
+
+    def validate_amount(self, value):
+        if value <= Decimal('0.00'):
+            raise serializers.ValidationError("Tuition amount must be greater than 0.")
+        return value
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        school = attrs.get('school')
+        if not school and request and hasattr(request.user, 'school') and request.user.school:
+            school = request.user.school
+
+        grade = attrs.get('grade')
+        if school and grade is not None:
+            qs = FeeStructure.objects.filter(school=school, grade=grade)
+            if self.instance:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise serializers.ValidationError(
+                    f"A fee structure for Grade {grade} already exists at {school.name}. Please edit the existing fee structure instead."
+                )
+        return attrs
+
 
 class InvoiceSerializer(serializers.ModelSerializer):
     balance_remaining = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
