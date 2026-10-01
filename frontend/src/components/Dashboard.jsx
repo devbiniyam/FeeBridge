@@ -265,6 +265,14 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               <button
                 type="button"
                 className="btn-quick-chip"
+                onClick={() => onNavigate('students')}
+              >
+                <Users size={15} className="text-teal" />
+                <span>My Enrolled Children</span>
+              </button>
+              <button
+                type="button"
+                className="btn-quick-chip"
                 onClick={() => onNavigate('wallet')}
               >
                 <CreditCard size={15} className="text-indigo" />
@@ -284,6 +292,14 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               <button
                 type="button"
                 className="btn-quick-chip"
+                onClick={() => onNavigate('students')}
+              >
+                <Users size={15} className="text-teal" />
+                <span>Campus Student Roster</span>
+              </button>
+              <button
+                type="button"
+                className="btn-quick-chip"
                 onClick={() => onNavigate('invoices')}
               >
                 <Receipt size={15} className="text-emerald" />
@@ -291,6 +307,7 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               </button>
             </>
           )}
+
         </div>
       </div>
 
@@ -414,7 +431,12 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               </div>
 
               {/* Students Roster */}
-              <div className="fintech-module-box box-students">
+              <div
+                className="fintech-module-box box-students"
+                onClick={() => onNavigate('students')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="module-box-top">
                   <div className="module-bubble bubble-teal">
                     <Users size={22} />
@@ -425,10 +447,11 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
                 <p>Manage registered students scoped to your campus, link parents, and maintain billing accounts.</p>
                 <div className="module-box-footer">
                   <span className="module-action-link">
-                    Enrolled Roster <ChevronRight size={14} />
+                    Open Student Roster <ChevronRight size={14} />
                   </span>
                 </div>
               </div>
+
 
               {/* Multi-Tenant Governance */}
               <div className="fintech-module-box box-school">

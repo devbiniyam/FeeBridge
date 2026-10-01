@@ -106,13 +106,20 @@ export default function Sidebar({ currentView, onSelectView, unreadCount = 0 }) 
         <div className="nav-group">
           <span className="nav-group-title">{isParent ? 'ACCOUNTS' : 'CAMPUS OPS'}</span>
 
-          <div className="sidebar-nav-item nav-item-disabled" title="Enrolled Students Roster">
-            <div className="nav-item-icon">
+          <button
+            type="button"
+            className={`sidebar-nav-item ${currentView === 'students' ? 'nav-item-active' : ''}`}
+            onClick={() => onSelectView('students')}
+            title={isParent ? 'Enrolled Children Billing Profiles' : 'Campus Students Roster'}
+          >
+            <div className="nav-item-icon icon-teal-tint">
               <Users size={18} />
             </div>
             <span className="nav-item-label">{isParent ? 'My Students' : 'Students Roster'}</span>
-            <span className="nav-badge-subtle">Managed</span>
-          </div>
+            <span className="nav-badge-subtle">Roster</span>
+            {currentView === 'students' && <div className="nav-active-pill" />}
+          </button>
+
 
           {!isParent && (
             <div className="sidebar-nav-item nav-item-disabled" title="Tuition Rates per Grade">

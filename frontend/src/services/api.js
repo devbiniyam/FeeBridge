@@ -243,5 +243,65 @@ export const walletService = {
   },
 };
 
+export const studentService = {
+  async getStudents(params = {}) {
+    const query = new URLSearchParams();
+    if (params.grade) query.append('grade', params.grade);
+    if (params.section) query.append('section', params.section);
+    if (params.search) query.append('search', params.search);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    const res = await apiRequest(`/students/${qs}`);
+    if (!res.ok) {
+      throw new Error('Failed to load students.');
+    }
+    return res.json();
+  },
+
+  async getStudent(id) {
+    const res = await apiRequest(`/students/${id}/`);
+    if (!res.ok) {
+      throw new Error('Failed to load student details.');
+    }
+    return res.json();
+  },
+
+  async createStudent(studentData) {
+    const res = await apiRequest('/students/', {
+      method: 'POST',
+      body: JSON.stringify(studentData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to create student.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to create student.');
+    }
+    return res.json();
+  },
+
+  async updateStudent(id, studentData) {
+    const res = await apiRequest(`/students/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(studentData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to update student.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to update student.');
+    }
+    return res.json();
+  },
+
+  async deleteStudent(id) {
+    const res = await apiRequest(`/students/${id}/`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      throw new Error('Failed to delete student.');
+    }
+    return true;
+  },
+};
+
+
 
 

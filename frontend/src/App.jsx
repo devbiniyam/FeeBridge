@@ -7,6 +7,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import InvoicesList from './components/InvoicesList';
 import WalletView from './components/WalletView';
+import StudentsView from './components/StudentsView';
 import WalletDepositModal from './components/WalletDepositModal';
 import GenerateInvoicesModal from './components/GenerateInvoicesModal';
 import { GraduationCap } from 'lucide-react';
@@ -15,7 +16,8 @@ import './App.css';
 function MainContent() {
   const { user, loading } = useAuth();
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices' | 'wallet'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices' | 'wallet' | 'students'
+
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
 
@@ -78,6 +80,11 @@ function MainContent() {
               onNavigateBack={() => setCurrentView('dashboard')}
               onNavigateToInvoices={() => setCurrentView('invoices')}
             />
+          ) : currentView === 'students' ? (
+            <StudentsView
+              onNavigateBack={() => setCurrentView('dashboard')}
+              onNavigateToInvoices={() => setCurrentView('invoices')}
+            />
           ) : (
             <Dashboard
               onNavigate={setCurrentView}
@@ -86,6 +93,7 @@ function MainContent() {
             />
           )}
         </main>
+
       </div>
 
       {/* Global Quick Action Modals */}

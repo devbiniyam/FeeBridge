@@ -28,6 +28,8 @@ export default function Navbar({
 
   const getViewTitle = () => {
     switch (currentView) {
+      case 'students':
+        return isParent ? 'My Enrolled Children' : 'Campus Students Directory';
       case 'wallet':
         return 'Digital Wallet & Balances';
       case 'invoices':
@@ -36,6 +38,7 @@ export default function Navbar({
         return 'Financial Overview';
     }
   };
+
 
   return (
     <header className="fintech-topbar">

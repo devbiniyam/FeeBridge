@@ -5214,4 +5214,436 @@ input:checked + .toggle-slider:before {
   }
 }
 
+/* ==========================================================================
+   STUDENT MANAGEMENT & CAMPUS ROSTER STYLING
+   ========================================================================== */
+
+.fintech-students-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.students-topbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.students-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+/* Filter & Search Bar */
+.students-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+  flex-wrap: wrap;
+}
+
+.students-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 260px;
+}
+
+.students-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  color: #0f172a;
+  width: 100%;
+}
+
+.students-grade-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-family: var(--font-sub);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.grade-select {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-family: var(--font-sub);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ================= PARENT: CHILDREN CARDS GRID ================= */
+.children-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.child-profile-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.child-profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.07);
+  border-color: #cbd5e1;
+}
+
+.child-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.child-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.avatar-female {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+}
+
+.avatar-male {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+.child-title-group {
+  flex: 1;
+}
+
+.child-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.child-name-row h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.child-grade-badge {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #4f46e5;
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.child-school-name {
+  font-family: var(--font-sub);
+  font-size: 0.76rem;
+  color: #64748b;
+  display: block;
+  margin-top: 2px;
+}
+
+.child-demographics-row {
+  display: flex;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  margin: 1.15rem 0;
+}
+
+.demographic-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.demographic-label {
+  font-family: var(--font-sub);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.demographic-item strong {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  color: #0f172a;
+  margin-top: 1px;
+}
+
+/* Tuition Progress in Child Card */
+.child-tuition-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.tuition-track-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tuition-track-label {
+  font-family: var(--font-sub);
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.06em;
+}
+
+.tuition-track-pct {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+.child-finance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.finance-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.finance-label {
+  font-family: var(--font-sub);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.finance-box strong {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 2px;
+}
+
+.child-card-footer {
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.btn-child-invoices {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.65rem;
+  border-radius: 10px;
+  font-family: var(--font-sub);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-child-invoices:hover {
+  background: #4f46e5;
+  color: #ffffff;
+  border-color: #4338ca;
+}
+
+/* ================= STAFF: CAMPUS ROSTER TABLE ================= */
+.student-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.student-avatar-mini {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.student-name-text {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: block;
+}
+
+.student-id-text {
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  color: #64748b;
+  display: block;
+}
+
+.grade-pill-tag {
+  display: inline-flex;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-family: var(--font-sub);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.parent-info-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.parent-name-text {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.parent-contact-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.badge-invoices-count {
+  font-family: var(--font-sub);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  color: #475569;
+}
+
+.btn-table-view-invoices {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-family: var(--font-sub);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-table-view-invoices:hover {
+  background: #4f46e5;
+  color: white;
+  border-color: #4338ca;
+}
+
+/* Enrollment Form */
+.enroll-form .form-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.enroll-form .span-2 {
+  grid-column: span 2;
+}
+
+.icon-teal {
+  background: #ecfeff;
+  color: #0891b2;
+}
+
+.icon-teal-tint {
+  color: #0891b2;
+}
+
+@media (max-width: 900px) {
+  .children-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .students-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+
 
