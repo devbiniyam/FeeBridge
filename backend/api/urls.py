@@ -14,14 +14,17 @@ from api.views.fees import (
     FeeStructureDetailView,
     InvoiceListCreateView,
     InvoiceDetailView,
-    BatchGenerateInvoicesView
+    BatchGenerateInvoicesView,
+    CreateInstallmentPlanView,
+    AutoPayRunView,
 )
 from api.views.payments import PaymentCreateView
 from api.views.wallets import (
     DepositView,
     WalletPaymentView,
     MyWalletView,
-    WalletTransactionListView
+    WalletTransactionListView,
+    ToggleAutoPayView,
 )
 from api.views.notifications import (
     NotificationListCreateView,
@@ -58,7 +61,9 @@ urlpatterns = [
 
     path('invoices/', InvoiceListCreateView.as_view(), name='invoice-list-create'),
     path('invoices/generate/', BatchGenerateInvoicesView.as_view(), name='invoice-batch-generate'),
+    path('invoices/auto-pay-run/', AutoPayRunView.as_view(), name='invoice-auto-pay-run'),
     path('invoices/<int:pk>/', InvoiceDetailView.as_view(), name='invoice-detail'),
+    path('invoices/<int:pk>/installments/', CreateInstallmentPlanView.as_view(), name='invoice-installments'),
     
     path('payments/', PaymentCreateView.as_view(), name='payment-create'),
     path('payments/checkout/initialize/', CheckoutInitializeView.as_view(), name='checkout-initialize'),
@@ -69,6 +74,7 @@ urlpatterns = [
     path('wallets/transactions/', WalletTransactionListView.as_view(), name='wallet-transactions'),
     path('wallets/deposit/', DepositView.as_view(), name='wallet-deposit'),
     path('wallets/pay-invoice/', WalletPaymentView.as_view(), name='wallet-pay-invoice'),
+    path('wallets/toggle-auto-pay/', ToggleAutoPayView.as_view(), name='wallet-toggle-auto-pay'),
     
     path('schools/', SchoolListCreateView.as_view(), name='school-list-create'),
     path('schools/<int:pk>/', SchoolDetailView.as_view(), name='school-detail'),

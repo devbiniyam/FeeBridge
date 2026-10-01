@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { invoiceService } from '../services/api';
 import PaymentModal from './PaymentModal';
 import GenerateInvoicesModal from './GenerateInvoicesModal';
+import CreateInstallmentPlanModal from './CreateInstallmentPlanModal';
 import {
   Receipt,
   Search,
@@ -23,7 +24,12 @@ import {
   ArrowRight,
   Filter,
   Check,
-  ChevronDown
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  Zap,
+  PlayCircle,
+  Undo2
 } from 'lucide-react';
 
 export default function InvoicesList({ onNavigateBack }) {
@@ -31,10 +37,15 @@ export default function InvoicesList({ onNavigateBack }) {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('ALL'); // 'ALL' | 'UNPAID' | 'PARTIALLY_PAID' | 'PAID'
+  const [activeTab, setActiveTab] = useState('ALL'); // 'ALL' | 'UNPAID' | 'PARTIALLY_PAID' | 'PAID' | 'INSTALLMENTS'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [targetedInstallment, setTargetedInstallment] = useState(null);
+  const [installmentModalInvoice, setInstallmentModalInvoice] = useState(null);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const [expandedInvoices, setExpandedInvoices] = useState({});
+  const [autoPayRunning, setAutoPayRunning] = useState(false);
+  const [autoPayResult, setAutoPayResult] = useState(null);
 
   const fetchInvoices = async () => {
     setLoading(true);
@@ -53,10 +64,51 @@ export default function InvoicesList({ onNavigateBack }) {
     fetchInvoices();
   }, []);
 
+  const toggleExpandInvoice = (invoiceId) => {
+    setExpandedInvoices((prev) => ({
+      ...prev,
+      [invoiceId]: !prev[invoiceId],
+    }));
+  };
+
+  const handleRunAutoPay = async () => {
+    if (!window.confirm('Execute Automated Due-Date Escrow Settlement? This will debit eligible parent wallets with Auto-Pay enabled to settle due tuition milestones.')) {
+      return;
+    }
+    setAutoPayRunning(true);
+    setAutoPayResult(null);
+    try {
+      const res = await invoiceService.runAutoPaySettlement();
+      setAutoPayResult(res);
+      await fetchInvoices();
+    } catch (err) {
+      alert(err.message || 'Auto-Pay batch settlement failed.');
+    } finally {
+      setAutoPayRunning(false);
+    }
+  };
+
+  const handleCancelInstallmentPlan = async (invoiceId) => {
+    if (!window.confirm('Cancel this installment milestone schedule and revert to standard lump-sum billing?')) {
+      return;
+    }
+    try {
+      await invoiceService.deleteInstallmentPlan(invoiceId);
+      await fetchInvoices();
+    } catch (err) {
+      alert(err.message || 'Failed to cancel installment schedule.');
+    }
+  };
+
+  const installmentCount = invoices.filter((i) => i.has_installments).length;
+
   const filteredInvoices = invoices.filter((inv) => {
     const matchesTab =
-      activeTab === 'ALL' ||
-      inv.status === activeTab;
+      activeTab === 'ALL'
+        ? true
+        : activeTab === 'INSTALLMENTS'
+        ? inv.has_installments
+        : inv.status === activeTab;
 
     const studentMatch = inv.student_name?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
     const schoolMatch = inv.school_name?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
@@ -122,13 +174,25 @@ export default function InvoicesList({ onNavigateBack }) {
 
         <div className="invoices-header-actions">
           {!isParent && (
-            <button
-              type="button"
-              className="btn-fintech-primary"
-              onClick={() => setIsGenerateModalOpen(true)}
-            >
-              <Sparkles size={16} /> Run Monthly Billing
-            </button>
+            <>
+              <button
+                type="button"
+                className="btn-fintech-secondary btn-autopay-trigger"
+                onClick={handleRunAutoPay}
+                disabled={autoPayRunning}
+                title="Execute automated escrow settlement batch across parent wallets"
+              >
+                <Zap size={16} className={autoPayRunning ? 'animate-pulse text-amber' : 'text-amber'} />
+                {autoPayRunning ? 'Running Settlements...' : 'Run Auto-Pay Settlement'}
+              </button>
+              <button
+                type="button"
+                className="btn-fintech-primary"
+                onClick={() => setIsGenerateModalOpen(true)}
+              >
+                <Sparkles size={16} /> Run Monthly Billing
+              </button>
+            </>
           )}
 
           <button type="button" className="btn-fintech-ghost" onClick={fetchInvoices} title="Reload Data">
@@ -136,6 +200,32 @@ export default function InvoicesList({ onNavigateBack }) {
           </button>
         </div>
       </div>
+
+      {/* Auto-Pay Settlement Banner */}
+      {autoPayResult && (
+        <div className="autopay-result-banner">
+          <div className="autopay-result-left">
+            <div className="autopay-result-bubble">
+              <Zap size={20} />
+            </div>
+            <div>
+              <strong>Automated Escrow Settlement Completed</strong>
+              <p>
+                Successfully cleared <strong>{autoPayResult.settled_count}</strong> tuition milestones/invoices totaling{' '}
+                <strong>{parseFloat(autoPayResult.total_amount_settled || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</strong>.
+                {autoPayResult.low_balance_count > 0 && (
+                  <span className="text-amber">
+                    {' '}({autoPayResult.low_balance_count} parent accounts issued low-balance alerts).
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+          <button type="button" className="btn-banner-dismiss" onClick={() => setAutoPayResult(null)}>
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Financial Pipeline KPI Bar */}
       <div className="pipeline-kpi-bar">
@@ -183,6 +273,13 @@ export default function InvoicesList({ onNavigateBack }) {
             onClick={() => setActiveTab('ALL')}
           >
             All Invoices ({invoices.length})
+          </button>
+          <button
+            type="button"
+            className={`ledger-tab ${activeTab === 'INSTALLMENTS' ? 'ledger-tab-active' : ''}`}
+            onClick={() => setActiveTab('INSTALLMENTS')}
+          >
+            <Layers size={13} style={{ marginRight: '4px', verticalAlign: 'text-bottom' }} /> Milestones ({installmentCount})
           </button>
           <button
             type="button"
@@ -277,7 +374,8 @@ export default function InvoicesList({ onNavigateBack }) {
                   const isFullyPaid = inv.status === 'PAID' || balanceRemaining <= 0;
 
                   return (
-                    <tr key={inv.id} className="ledger-row">
+                    <React.Fragment key={inv.id}>
+                      <tr className="ledger-row">
                       {/* Invoice ID */}
                       <td>
                         <div className="inv-code-cell">
@@ -290,9 +388,23 @@ export default function InvoicesList({ onNavigateBack }) {
                       {/* Student & School */}
                       <td>
                         <div className="student-cell-group">
-                          <strong className="student-cell-name">
-                            {inv.student_name || `Student #${inv.student}`}
-                          </strong>
+                          <div className="student-title-row">
+                            <strong className="student-cell-name">
+                              {inv.student_name || `Student #${inv.student}`}
+                            </strong>
+                            {inv.has_installments && (
+                              <button
+                                type="button"
+                                className="badge-milestones-summary"
+                                onClick={() => toggleExpandInvoice(inv.id)}
+                                title="Click to view installment milestone breakdown"
+                              >
+                                <Layers size={11} />
+                                <span>{inv.paid_installments_count}/{inv.installments_count} Milestones</span>
+                                {expandedInvoices[inv.id] ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                              </button>
+                            )}
+                          </div>
                           <div className="student-cell-tags">
                             <span className="badge-grade">Grade {inv.student_grade || 'N/A'}-{inv.student_section || 'A'}</span>
                             {inv.school_name && (
@@ -355,15 +467,68 @@ export default function InvoicesList({ onNavigateBack }) {
                             <span className="paid-check-tag">
                               <CheckCircle2 size={14} /> Settled
                             </span>
+                          ) : inv.has_installments ? (
+                            <div className="action-buttons-group">
+                              <button
+                                type="button"
+                                className="btn-table-milestones"
+                                onClick={() => toggleExpandInvoice(inv.id)}
+                                title="View milestone breakdown and pay installments"
+                              >
+                                <Layers size={13} /> {expandedInvoices[inv.id] ? 'Hide Plan' : 'Milestones'}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-table-pay"
+                                onClick={() => {
+                                  setSelectedInvoice(inv);
+                                  setTargetedInstallment(null);
+                                }}
+                              >
+                                <CreditCard size={13} /> Pay Full
+                              </button>
+                            </div>
                           ) : (
-                            <button
-                              type="button"
-                              className="btn-table-pay"
-                              onClick={() => setSelectedInvoice(inv)}
-                            >
-                              <CreditCard size={14} /> Pay Now
-                            </button>
+                            <div className="action-buttons-group">
+                              <button
+                                type="button"
+                                className="btn-table-pay"
+                                onClick={() => {
+                                  setSelectedInvoice(inv);
+                                  setTargetedInstallment(null);
+                                }}
+                              >
+                                <CreditCard size={14} /> Pay Now
+                              </button>
+                              {amountPaid === 0 && (
+                                <button
+                                  type="button"
+                                  className="btn-table-split"
+                                  onClick={() => setInstallmentModalInvoice(inv)}
+                                  title="Split tuition into 2 or 3 milestone payments"
+                                >
+                                  <Layers size={13} /> Split
+                                </button>
+                              )}
+                            </div>
                           )
+                        ) : inv.has_installments ? (
+                          <button
+                            type="button"
+                            className="btn-table-milestones"
+                            onClick={() => toggleExpandInvoice(inv.id)}
+                          >
+                            <Layers size={13} /> {expandedInvoices[inv.id] ? 'Hide' : `${inv.installments_count} Milestones`}
+                          </button>
+                        ) : !isFullyPaid && amountPaid === 0 ? (
+                          <button
+                            type="button"
+                            className="btn-table-split"
+                            onClick={() => setInstallmentModalInvoice(inv)}
+                            title="Split tuition into milestones for parent"
+                          >
+                            <Layers size={13} /> Split Plan
+                          </button>
                         ) : (
                           <span className="staff-view-pill">
                             Active
@@ -371,8 +536,90 @@ export default function InvoicesList({ onNavigateBack }) {
                         )}
                       </td>
                     </tr>
-                  );
-                })}
+                    {expandedInvoices[inv.id] && inv.installments && (
+                      <tr className="expanded-milestones-row">
+                        <td colSpan="8">
+                          <div className="milestones-nested-panel">
+                            <div className="nested-panel-header">
+                              <div className="panel-title-group">
+                                <Layers size={16} className="text-purple" />
+                                <strong>Tuition Installment Schedule ({inv.installments.length} Milestones)</strong>
+                                <span className="panel-subtitle">Sequential due-date milestones with independent wallet and direct bank settlement</span>
+                              </div>
+                              {amountPaid === 0 && (
+                                <button
+                                  type="button"
+                                  className="btn-cancel-schedule"
+                                  onClick={() => handleCancelInstallmentPlan(inv.id)}
+                                  title="Cancel schedule and revert to standard single invoice"
+                                >
+                                  <Undo2 size={13} /> Cancel Schedule
+                                </button>
+                              )}
+                            </div>
+
+                            <div className="milestones-cards-grid">
+                              {inv.installments.map((inst) => {
+                                const instDue = new Date(inst.due_date);
+                                const isInstPaid = inst.status === 'PAID' || inst.is_paid;
+                                const isInstOverdue = inst.status === 'OVERDUE';
+                                const instRemaining = parseFloat(inst.balance_remaining || 0);
+
+                                return (
+                                  <div
+                                    key={inst.id}
+                                    className={`milestone-card ${isInstPaid ? 'card-milestone-paid' : isInstOverdue ? 'card-milestone-overdue' : ''}`}
+                                  >
+                                    <div className="milestone-card-top">
+                                      <span className="milestone-badge-num">Milestone #{inst.installment_number}</span>
+                                      <span className={`status-pill ${isInstPaid ? 'status-paid' : isInstOverdue ? 'status-overdue' : 'status-unpaid'}`}>
+                                        {isInstPaid ? 'Cleared' : isInstOverdue ? 'Overdue' : 'Pending'}
+                                      </span>
+                                    </div>
+
+                                    <h5 className="milestone-card-title">{inst.title}</h5>
+
+                                    <div className="milestone-card-amounts">
+                                      <div className="amount-col">
+                                        <span className="micro-label">AMOUNT</span>
+                                        <strong>{parseFloat(inst.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB</strong>
+                                      </div>
+                                      <div className="amount-col">
+                                        <span className="micro-label">BALANCE DUE</span>
+                                        <strong className={isInstPaid ? 'text-emerald' : 'text-amber'}>
+                                          {instRemaining.toLocaleString('en-US', { minimumFractionDigits: 2 })} ETB
+                                        </strong>
+                                      </div>
+                                    </div>
+
+                                    <div className="milestone-card-due">
+                                      <Calendar size={12} />
+                                      <span>Due: {instDue.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                    </div>
+
+                                    {isParent && !isInstPaid && (
+                                      <button
+                                        type="button"
+                                        className="btn-pay-milestone-card"
+                                        onClick={() => {
+                                          setSelectedInvoice(inv);
+                                          setTargetedInstallment(inst);
+                                        }}
+                                      >
+                                        <CreditCard size={13} /> Settle Milestone
+                                      </button>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
               </tbody>
             </table>
           </div>
@@ -383,8 +630,23 @@ export default function InvoicesList({ onNavigateBack }) {
       {selectedInvoice && (
         <PaymentModal
           invoice={selectedInvoice}
-          onClose={() => setSelectedInvoice(null)}
+          targetedInstallment={targetedInstallment}
+          onClose={() => {
+            setSelectedInvoice(null);
+            setTargetedInstallment(null);
+          }}
           onPaymentSuccess={() => {
+            fetchInvoices();
+          }}
+        />
+      )}
+
+      {/* Create Installment Plan Modal */}
+      {installmentModalInvoice && (
+        <CreateInstallmentPlanModal
+          invoice={installmentModalInvoice}
+          onClose={() => setInstallmentModalInvoice(null)}
+          onSuccess={() => {
             fetchInvoices();
           }}
         />

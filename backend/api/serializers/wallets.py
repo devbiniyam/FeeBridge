@@ -65,6 +65,7 @@ class DepositSerializer(serializers.ModelSerializer):
 class WalletPaymentSerializer(serializers.Serializer):
     invoice = serializers.PrimaryKeyRelatedField(queryset=Invoice.objects.all())
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    installment = serializers.IntegerField(required=False, allow_null=True)
 
     def validate(self, data):
         invoice = data['invoice']
@@ -74,18 +75,35 @@ class WalletPaymentSerializer(serializers.Serializer):
         if not wallet:
             raise serializers.ValidationError("User does not have a wallet.")
 
+        installment_id = data.get('installment')
         amount = data.get('amount')
-        if not amount:
-            amount = invoice.balance_remaining
-            data['amount'] = amount
+
+        if installment_id:
+            inst = invoice.installments.filter(id=installment_id).first()
+            if not inst:
+                raise serializers.ValidationError("Installment not found for this invoice.")
+            if inst.balance_remaining <= 0:
+                raise serializers.ValidationError("This installment is already fully paid.")
+            if not amount:
+                amount = inst.balance_remaining
+                data['amount'] = amount
+            elif amount > inst.balance_remaining:
+                raise serializers.ValidationError(
+                    f"Amount ({amount} ETB) exceeds installment balance ({inst.balance_remaining} ETB)."
+                )
+            data['installment_obj'] = inst
+        else:
+            if not amount:
+                amount = invoice.balance_remaining
+                data['amount'] = amount
+
+            if amount > invoice.balance_remaining:
+                raise serializers.ValidationError(
+                    f"Amount ({amount} ETB) exceeds outstanding balance ({invoice.balance_remaining} ETB)."
+                )
 
         if amount <= 0:
             raise serializers.ValidationError("Payment amount must be greater than zero.")
-
-        if amount > invoice.balance_remaining:
-            raise serializers.ValidationError(
-                f"Amount ({amount} ETB) exceeds outstanding balance ({invoice.balance_remaining} ETB)."
-            )
 
         if wallet.balance < amount:
             raise serializers.ValidationError(
@@ -98,13 +116,15 @@ class WalletPaymentSerializer(serializers.Serializer):
         invoice = validated_data['invoice']
         user = self.context['request'].user
         amount = validated_data['amount']
+        installment = validated_data.get('installment_obj')
 
         return process_payment(
             invoice=invoice,
             paid_by=user,
             amount=amount,
             method=PaymentChoices.WALLET,
-            wallet=user.wallet
+            wallet=user.wallet,
+            installment=installment
         )
 
     def to_representation(self, instance):
@@ -155,10 +175,13 @@ class WalletDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'balance',
+            'auto_pay_enabled',
+            'low_balance_threshold',
             'total_deposited',
             'total_deducted',
             'recent_transactions'
         ]
+
 
     def get_total_deposited(self, obj):
         from django.db.models import Sum

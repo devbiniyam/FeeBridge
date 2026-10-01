@@ -31,7 +31,10 @@ export default function WalletView({ onNavigateBack, onNavigateToInvoices }) {
   const [error, setError] = useState('');
   const [activeTxTab, setActiveTxTab] = useState('ALL'); // 'ALL' | 'DEPOSIT' | 'DEDUCTION'
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-  const [autoDeduct, setAutoDeduct] = useState(true);
+  const [autoPayEnabled, setAutoPayEnabled] = useState(false);
+  const [lowBalanceThreshold, setLowBalanceThreshold] = useState('1000.00');
+  const [savingAutoPay, setSavingAutoPay] = useState(false);
+  const [autoPaySuccessMsg, setAutoPaySuccessMsg] = useState('');
 
   const fetchWallet = async () => {
     setLoading(true);
@@ -43,11 +46,52 @@ export default function WalletView({ onNavigateBack, onNavigateToInvoices }) {
       ]);
       setWalletData(walletRes);
       setTransactions(txRes);
+      setAutoPayEnabled(walletRes.auto_pay_enabled ?? false);
+      if (walletRes.low_balance_threshold !== undefined && walletRes.low_balance_threshold !== null) {
+        setLowBalanceThreshold(String(walletRes.low_balance_threshold));
+      }
       await refreshProfile();
     } catch (err) {
       setError(err.message || 'Could not fetch wallet data.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleAutoPay = async (newVal) => {
+    setAutoPayEnabled(newVal);
+    setSavingAutoPay(true);
+    setAutoPaySuccessMsg('');
+    try {
+      const updated = await walletService.toggleAutoPay(newVal, lowBalanceThreshold);
+      setWalletData(updated);
+      setAutoPaySuccessMsg(
+        newVal
+          ? 'Auto-Pay Activated: Due tuition & milestone installments will automatically settle!'
+          : 'Auto-Pay Paused: Invoices will require manual clearance.'
+      );
+      setTimeout(() => setAutoPaySuccessMsg(''), 4500);
+    } catch (err) {
+      alert(err.message || 'Failed to update Auto-Pay settings.');
+      setAutoPayEnabled(!newVal);
+    } finally {
+      setSavingAutoPay(false);
+    }
+  };
+
+  const handleSaveThreshold = async (e) => {
+    if (e) e.preventDefault();
+    setSavingAutoPay(true);
+    setAutoPaySuccessMsg('');
+    try {
+      const updated = await walletService.toggleAutoPay(autoPayEnabled, lowBalanceThreshold);
+      setWalletData(updated);
+      setAutoPaySuccessMsg(`Low-balance threshold updated to ${parseFloat(lowBalanceThreshold).toLocaleString()} ETB.`);
+      setTimeout(() => setAutoPaySuccessMsg(''), 4000);
+    } catch (err) {
+      alert(err.message || 'Failed to update threshold.');
+    } finally {
+      setSavingAutoPay(false);
     }
   };
 
@@ -242,20 +286,66 @@ export default function WalletView({ onNavigateBack, onNavigateToInvoices }) {
             </button>
           </div>
 
-          {/* Automated Deduction Toggle */}
-          <div className="auto-deduct-bar">
-            <div className="auto-deduct-info">
-              <strong>Automated Tuition Clearance</strong>
-              <span>Automatically clear invoices from wallet on due date</span>
+          {/* Automated Escrow Settlement Module */}
+          <div className="autopay-settings-card">
+            <div className="autopay-card-header">
+              <div className="autopay-header-text">
+                <div className="autopay-title-row">
+                  <ShieldCheck size={16} className={autoPayEnabled ? "text-emerald" : "text-muted"} />
+                  <strong>Escrow Auto-Pay Guarantee</strong>
+                  <span className={`status-pill ${autoPayEnabled ? "status-paid" : "status-unpaid"}`}>
+                    {autoPayEnabled ? "Active Guarantee" : "Paused"}
+                  </span>
+                </div>
+                <p className="autopay-explainer">
+                  Automatically clear tuition invoices & milestone schedules from your escrow balance on their exact due dates.
+                </p>
+              </div>
+
+              <label className="toggle-switch" title="Toggle Auto-Pay">
+                <input
+                  type="checkbox"
+                  checked={autoPayEnabled}
+                  disabled={savingAutoPay}
+                  onChange={(e) => handleToggleAutoPay(e.target.checked)}
+                />
+                <span className="toggle-slider"></span>
+              </label>
             </div>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={autoDeduct}
-                onChange={() => setAutoDeduct(!autoDeduct)}
-              />
-              <span className="toggle-slider"></span>
-            </label>
+
+            {/* Threshold Configuration */}
+            <form onSubmit={handleSaveThreshold} className="autopay-threshold-row">
+              <div className="threshold-input-group">
+                <label className="micro-label">LOW BALANCE ALERT THRESHOLD</label>
+                <div className="threshold-field-wrapper">
+                  <input
+                    type="number"
+                    step="50"
+                    min="0"
+                    className="input-fintech threshold-input"
+                    value={lowBalanceThreshold}
+                    onChange={(e) => setLowBalanceThreshold(e.target.value)}
+                    placeholder="1000"
+                  />
+                  <span className="threshold-unit">ETB</span>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="btn-save-threshold"
+                disabled={savingAutoPay}
+              >
+                {savingAutoPay ? 'Saving...' : 'Set Alert Level'}
+              </button>
+            </form>
+
+            {autoPaySuccessMsg && (
+              <div className="autopay-toast-success">
+                <CheckCircle2 size={14} />
+                <span>{autoPaySuccessMsg}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 from decimal import Decimal
 from rest_framework import serializers
-from fees.models import FeeStructure, Invoice
+from fees.models import FeeStructure, Invoice, InvoiceInstallment
 from schools.models import School
 
 
@@ -74,12 +74,38 @@ class FeeStructureSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class InvoiceInstallmentSerializer(serializers.ModelSerializer):
+    balance_remaining = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    is_paid = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = InvoiceInstallment
+        fields = [
+            'id',
+            'invoice',
+            'installment_number',
+            'title',
+            'amount',
+            'amount_paid',
+            'balance_remaining',
+            'due_date',
+            'status',
+            'paid_at',
+            'is_paid',
+        ]
+        read_only_fields = ['amount_paid', 'balance_remaining', 'status', 'paid_at']
+
+
 class InvoiceSerializer(serializers.ModelSerializer):
     balance_remaining = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     student_name = serializers.CharField(source='student.full_name', read_only=True)
     student_grade = serializers.IntegerField(source='student.grade', read_only=True)
     student_section = serializers.CharField(source='student.section', read_only=True)
     school_name = serializers.CharField(source='student.school.name', read_only=True)
+    has_installments = serializers.BooleanField(read_only=True)
+    installments_count = serializers.IntegerField(read_only=True)
+    paid_installments_count = serializers.IntegerField(read_only=True)
+    installments = InvoiceInstallmentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Invoice

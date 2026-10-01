@@ -125,12 +125,52 @@ export const invoiceService = {
     }
     return res.json();
   },
+
+  async createInstallmentPlan(invoiceId, payload) {
+    const res = await apiRequest(`/invoices/${invoiceId}/installments/`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to create installment plan.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to create installment plan.');
+    }
+    return res.json();
+  },
+
+  async deleteInstallmentPlan(invoiceId) {
+    const res = await apiRequest(`/invoices/${invoiceId}/installments/`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to cancel installment plan.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to cancel installment plan.');
+    }
+    return res.json();
+  },
+
+  async runAutoPaySettlement(schoolId = null) {
+    const payload = schoolId ? { school_id: schoolId } : {};
+    const res = await apiRequest('/invoices/auto-pay-run/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Auto-Pay settlement failed.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Auto-Pay settlement failed.');
+    }
+    return res.json();
+  },
 };
 
 export const paymentService = {
-  async payWithWallet(invoiceId, amount) {
+  async payWithWallet(invoiceId, amount = null, installmentId = null) {
     const payload = { invoice: invoiceId };
     if (amount) payload.amount = amount;
+    if (installmentId) payload.installment = installmentId;
     const res = await apiRequest('/wallets/pay-invoice/', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -143,7 +183,7 @@ export const paymentService = {
     return res.json();
   },
 
-  async payDirect(invoiceId, amount, method = 'CBE', fundingSource = '', sourceAccount = '', referenceNumber = '') {
+  async payDirect(invoiceId, amount, method = 'CBE', fundingSource = '', sourceAccount = '', referenceNumber = '', installmentId = null) {
     const payload = {
       invoice: invoiceId,
       amount: amount,
@@ -152,6 +192,7 @@ export const paymentService = {
       source_account: sourceAccount,
       reference_number: referenceNumber,
     };
+    if (installmentId) payload.installment = installmentId;
     const res = await apiRequest('/payments/', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -238,6 +279,23 @@ export const walletService = {
       const err = await res.json().catch(() => ({ detail: 'Deposit checkout failed.' }));
       const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
       throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Checkout failed.');
+    }
+    return res.json();
+  },
+
+  async toggleAutoPay(autoPayEnabled, lowBalanceThreshold = null) {
+    const payload = { auto_pay_enabled: autoPayEnabled };
+    if (lowBalanceThreshold !== null && lowBalanceThreshold !== undefined && lowBalanceThreshold !== '') {
+      payload.low_balance_threshold = lowBalanceThreshold;
+    }
+    const res = await apiRequest('/wallets/toggle-auto-pay/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to update Auto-Pay settings.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to update Auto-Pay settings.');
     }
     return res.json();
   },

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from accounts.models import User
 from fees.models import Invoice
@@ -5,10 +6,12 @@ from fees.models import Invoice
 
 class Wallet(models.Model):
     parent = models.OneToOneField(User, on_delete=models.PROTECT, related_name="wallet")
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    auto_pay_enabled = models.BooleanField(default=False)
+    low_balance_threshold = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('1000.00'))
 
     def __str__(self):
-        return f"{self.parent} - Balance: {self.balance} ETB"
+        return f"{self.parent} - Balance: {self.balance} ETB (Auto-Pay: {self.auto_pay_enabled})"
 
 
 class TransactionChoices(models.TextChoices):

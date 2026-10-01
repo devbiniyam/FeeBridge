@@ -18,10 +18,11 @@ import {
   Lock,
   RefreshCw,
   Zap,
-  Info
+  Info,
+  Layers
 } from 'lucide-react';
 
-export default function PaymentModal({ invoice, onClose, onPaymentSuccess }) {
+export default function PaymentModal({ invoice, targetedInstallment = null, onClose, onPaymentSuccess }) {
   const { user, refreshProfile } = useAuth();
   const [selectedMethod, setSelectedMethod] = useState('WALLET'); // 'WALLET' | 'CBE' | 'TELEBIRR' | 'BOA' | 'AWASH' | 'DASHEN' | 'COOP' | 'CARD' | 'CHAPA'
   const [paymentType, setPaymentType] = useState('FULL'); // 'FULL' | 'PARTIAL'
@@ -37,7 +38,9 @@ export default function PaymentModal({ invoice, onClose, onPaymentSuccess }) {
   const [error, setError] = useState('');
   const [successData, setSuccessData] = useState(null);
 
-  const balance = parseFloat(invoice.balance_remaining || invoice.amount || 0);
+  const balance = targetedInstallment
+    ? parseFloat(targetedInstallment.balance_remaining || targetedInstallment.amount || 0)
+    : parseFloat(invoice.balance_remaining || invoice.amount || 0);
   const walletBalance = parseFloat(user?.wallet_balance || 0);
 
   const paymentAmount = paymentType === 'FULL' ? balance : parseFloat(customAmount || 0);
@@ -100,11 +103,13 @@ export default function PaymentModal({ invoice, onClose, onPaymentSuccess }) {
     setLoading(true);
     setError('');
     try {
-      const receipt = await paymentService.payWithWallet(invoice.id, paymentAmount);
+      const receipt = await paymentService.payWithWallet(invoice.id, paymentAmount, targetedInstallment?.id);
       setSuccessData({
         ...receipt,
         paymentChannelName: 'FeeBridge Digital Wallet (Instant Escrow)',
         sourceAccountMasked: `Wallet Balance (${walletBalance.toFixed(2)} ETB)`,
+        installment_title: targetedInstallment?.title,
+        installment_number: targetedInstallment?.installment_number,
       });
       await refreshProfile();
       if (onPaymentSuccess) onPaymentSuccess();
@@ -128,7 +133,8 @@ export default function PaymentModal({ invoice, onClose, onPaymentSuccess }) {
         selectedMethod,
         selectedMethod,
         sourceAccount,
-        refCode
+        refCode,
+        targetedInstallment?.id
       );
 
       setSuccessData({
@@ -142,6 +148,8 @@ export default function PaymentModal({ invoice, onClose, onPaymentSuccess }) {
         paid_at: new Date().toISOString(),
         invoice_status: paymentAmount >= balance ? 'PAID' : 'PARTIALLY_PAID',
         invoice_balance: Math.max(0, balance - paymentAmount).toFixed(2),
+        installment_title: targetedInstallment?.title,
+        installment_number: targetedInstallment?.installment_number,
       });
 
       await refreshProfile();
@@ -198,6 +206,12 @@ export default function PaymentModal({ invoice, onClose, onPaymentSuccess }) {
               <p className="modal-subtitle">
                 {invoice.student_name} • Grade {invoice.student_grade || invoice.grade || '7'} • {invoice.school_name || 'Campus'}
               </p>
+              {targetedInstallment && !successData && (
+                <div className="targeted-milestone-pill">
+                  <Layers size={13} />
+                  <span>Targeted Milestone #{targetedInstallment.installment_number}: <strong>{targetedInstallment.title}</strong></span>
+                </div>
+              )}
             </div>
           </div>
           <button className="btn-close" onClick={onClose} aria-label="Close">
@@ -239,6 +253,13 @@ export default function PaymentModal({ invoice, onClose, onPaymentSuccess }) {
                     <span className="receipt-label">Billing Month</span>
                     <span className="receipt-val">{invoice.month}</span>
                   </div>
+
+                  {successData.installment_title && (
+                    <div className="receipt-item">
+                      <span className="receipt-label">Milestone Cleared</span>
+                      <span className="receipt-val font-bold text-purple">{successData.installment_title}</span>
+                    </div>
+                  )}
 
                   <div className="receipt-item">
                     <span className="receipt-label">Amount Cleared</span>

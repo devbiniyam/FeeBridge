@@ -8656,6 +8656,773 @@ input:checked + .toggle-slider:before {
   }
 }
 
+/* ==========================================================================
+   FEATURE 9 & 10: AUTO-PAY ESCROW & INSTALLMENT MILESTONES STYLES
+   ========================================================================== */
+
+/* Modal Installment Dialog */
+.modal-installment-dialog {
+  max-width: 680px !important;
+  width: 95%;
+}
+
+.installment-summary-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(30, 27, 75, 0.2);
+}
+
+.banner-eyebrow {
+  display: block;
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #a5b4fc;
+  margin-bottom: 0.25rem;
+}
+
+.banner-amount {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.banner-details {
+  text-align: right;
+}
+
+.banner-student {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.banner-meta {
+  font-family: var(--font-sub);
+  font-size: 0.78rem;
+  color: #c7d2fe;
+}
+
+/* Installment Plan Selector Cards */
+.installment-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.installment-plan-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.installment-plan-card:hover {
+  border-color: #a5b4fc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+}
+
+.installment-plan-card.plan-card-active {
+  border-color: #6366f1;
+  background: #faf5ff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.plan-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.plan-badge {
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.plan-card-active .plan-badge {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.plan-title {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.plan-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.35;
+  margin: 0 0 0.75rem 0;
+  flex-grow: 1;
+}
+
+.plan-breakdown-preview {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+  border: 1px dashed #cbd5e1;
+  font-size: 0.72rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  color: #475569;
+}
+
+.preview-row strong {
+  font-family: var(--font-heading);
+  color: #0f172a;
+}
+
+/* Timeline Preview */
+.milestones-timeline-preview {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  padding: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.timeline-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  margin: 0 0 0.85rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.milestones-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.milestone-step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ede9fe;
+  color: #6d28d9;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.step-title {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.step-due {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.step-amount {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Custom Milestones Builder */
+.custom-milestones-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.custom-milestone-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.65rem;
+  background: #ffffff;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+}
+
+.custom-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex-grow: 1;
+}
+
+.mini-label {
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.mini-input {
+  padding: 0.45rem 0.65rem !important;
+  font-size: 0.82rem !important;
+  height: 34px !important;
+}
+
+.btn-remove-step {
+  height: 34px;
+  width: 34px;
+  border-radius: var(--radius-md);
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-remove-step:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.btn-add-step {
+  background: #f1f5f9;
+  border: 1.5px dashed #cbd5e1;
+  color: #475569;
+  padding: 0.65rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sub);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-add-step:hover {
+  border-color: #94a3b8;
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.escrow-milestone-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  color: #166534;
+  line-height: 1.4;
+}
+
+/* Auto-Pay Settlement Trigger & Banner */
+.btn-autopay-trigger {
+  background: #fffbeb !important;
+  border-color: #fef3c7 !important;
+  color: #b45309 !important;
+  font-weight: 700 !important;
+}
+
+.btn-autopay-trigger:hover {
+  background: #fef3c7 !important;
+  border-color: #fde68a !important;
+  color: #92400e !important;
+}
+
+.autopay-result-banner {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.4rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+}
+
+.autopay-result-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.autopay-result-bubble {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #059669;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.autopay-result-left strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: #065f46;
+}
+
+.autopay-result-left p {
+  margin: 0.15rem 0 0 0;
+  font-size: 0.82rem;
+  color: #047857;
+}
+
+.btn-banner-dismiss {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-family: var(--font-sub);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-banner-dismiss:hover {
+  background: #ffffff;
+}
+
+/* Invoices Table Milestone Additions */
+.student-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge-milestones-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.badge-milestones-summary:hover {
+  background: #e9d5ff;
+  border-color: #d8b4fe;
+}
+
+.btn-table-milestones {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  background: #faf5ff;
+  border: 1px solid #d8b4fe;
+  color: #7e22ce;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sub);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-table-milestones:hover {
+  background: #f3e8ff;
+}
+
+.btn-table-split {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sub);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-table-split:hover {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #6d28d9;
+}
+
+/* Expanded Milestones Nested Panel */
+.expanded-milestones-row td {
+  padding: 0 !important;
+  background: #faf5ff !important;
+}
+
+.milestones-nested-panel {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid #f3e8ff;
+  border-bottom: 2px solid #e9d5ff;
+}
+
+.nested-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.panel-title-group strong {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: #3b0764;
+}
+
+.panel-subtitle {
+  font-size: 0.78rem;
+  color: #7e22ce;
+  opacity: 0.85;
+}
+
+.btn-cancel-schedule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: 1px solid #e9d5ff;
+  color: #7e22ce;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sub);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cancel-schedule:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.milestones-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.milestone-card {
+  background: #ffffff;
+  border: 1px solid #e9d5ff;
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 2px 6px rgba(126, 34, 206, 0.04);
+}
+
+.card-milestone-paid {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.card-milestone-overdue {
+  border-color: #fecaca;
+  background: #fff1f2;
+}
+
+.milestone-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.milestone-badge-num {
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6b21a8;
+}
+
+.milestone-card-title {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.milestone-card-amounts {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-top: 1px dashed #e2e8f0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.amount-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.amount-col strong {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+}
+
+.milestone-card-due {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.btn-pay-milestone-card {
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.55rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sub);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(109, 40, 217, 0.25);
+}
+
+.btn-pay-milestone-card:hover {
+  background: #5b21b6;
+  transform: translateY(-1px);
+}
+
+/* PaymentModal Targeted Milestone Pill */
+.targeted-milestone-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  background: #f3e8ff;
+  border: 1px solid #d8b4fe;
+  color: #6b21a8;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+}
+
+.targeted-milestone-pill strong {
+  color: #581c87;
+}
+
+/* WalletView Escrow Auto-Pay Module */
+.autopay-settings-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.4rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.autopay-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.autopay-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.25rem;
+}
+
+.autopay-title-row strong {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.autopay-explainer {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.autopay-threshold-row {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed #e2e8f0;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.85rem;
+}
+
+.threshold-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex-grow: 1;
+}
+
+.threshold-field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.threshold-input {
+  padding-right: 45px !important;
+  height: 36px !important;
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+}
+
+.threshold-unit {
+  position: absolute;
+  right: 12px;
+  font-family: var(--font-sub);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.btn-save-threshold {
+  height: 36px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 0 1rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sub);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-save-threshold:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.autopay-toast-success {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: #059669;
+  font-weight: 600;
+  background: #ecfdf5;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 900px) {
+  .installment-plans-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .autopay-threshold-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+
 
 
 
