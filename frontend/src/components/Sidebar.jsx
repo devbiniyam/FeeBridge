@@ -136,8 +136,13 @@ export default function Sidebar({ currentView, onSelectView, unreadCount = 0 }) 
         <div className="nav-group">
           <span className="nav-group-title">COMMUNICATION</span>
 
-          <div className="sidebar-nav-item nav-item-disabled" title="Alerts & Reminders">
-            <div className="nav-item-icon">
+          <button
+            type="button"
+            className={`sidebar-nav-item ${currentView === 'notifications' ? 'nav-item-active' : ''}`}
+            onClick={() => onSelectView('notifications')}
+            title="Alerts & Reminders Hub"
+          >
+            <div className="nav-item-icon icon-purple-tint">
               <Bell size={18} />
             </div>
             <span className="nav-item-label">Notifications</span>
@@ -146,7 +151,8 @@ export default function Sidebar({ currentView, onSelectView, unreadCount = 0 }) 
             ) : (
               <span className="nav-badge-subtle">0</span>
             )}
-          </div>
+            {currentView === 'notifications' && <div className="nav-active-pill" />}
+          </button>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
@@ -8,18 +8,38 @@ import Dashboard from './components/Dashboard';
 import InvoicesList from './components/InvoicesList';
 import WalletView from './components/WalletView';
 import StudentsView from './components/StudentsView';
+import NotificationsView from './components/NotificationsView';
 import WalletDepositModal from './components/WalletDepositModal';
 import GenerateInvoicesModal from './components/GenerateInvoicesModal';
+import { notificationService } from './services/api';
 import { GraduationCap } from 'lucide-react';
 import './App.css';
 
 function MainContent() {
   const { user, loading } = useAuth();
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices' | 'wallet' | 'students'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices' | 'wallet' | 'students' | 'notifications'
 
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnreadCount = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await notificationService.getUnreadCount();
+      setUnreadCount(res.unread_count || 0);
+    } catch (err) {
+      console.error('Failed to fetch unread count:', err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchUnreadCount();
+    // Refresh unread counts every 20 seconds
+    const timer = setInterval(fetchUnreadCount, 20000);
+    return () => clearInterval(timer);
+  }, [fetchUnreadCount]);
 
   if (loading) {
     return (
@@ -59,6 +79,7 @@ function MainContent() {
       <Sidebar
         currentView={currentView}
         onSelectView={setCurrentView}
+        unreadCount={unreadCount}
       />
 
       {/* Main Viewport */}
@@ -69,6 +90,8 @@ function MainContent() {
           onSelectView={setCurrentView}
           onTriggerDeposit={() => setIsDepositModalOpen(true)}
           onTriggerGenerate={() => setIsGenerateModalOpen(true)}
+          unreadCount={unreadCount}
+          onNotificationRead={fetchUnreadCount}
         />
 
         {/* Viewport Content */}
@@ -85,6 +108,13 @@ function MainContent() {
               onNavigateBack={() => setCurrentView('dashboard')}
               onNavigateToInvoices={() => setCurrentView('invoices')}
             />
+          ) : currentView === 'notifications' ? (
+            <NotificationsView
+              onNavigateBack={() => setCurrentView('dashboard')}
+              onNavigateToInvoices={() => {
+                setCurrentView('invoices');
+              }}
+            />
           ) : (
             <Dashboard
               onNavigate={setCurrentView}
@@ -93,7 +123,6 @@ function MainContent() {
             />
           )}
         </main>
-
       </div>
 
       {/* Global Quick Action Modals */}
@@ -103,6 +132,7 @@ function MainContent() {
           onClose={() => setIsDepositModalOpen(false)}
           onSuccess={() => {
             setIsDepositModalOpen(false);
+            fetchUnreadCount();
           }}
         />
       )}
@@ -112,6 +142,7 @@ function MainContent() {
           onClose={() => setIsGenerateModalOpen(false)}
           onSuccess={() => {
             setIsGenerateModalOpen(false);
+            fetchUnreadCount();
             if (currentView !== 'invoices') {
               setCurrentView('invoices');
             }

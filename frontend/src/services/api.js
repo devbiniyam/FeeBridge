@@ -302,6 +302,73 @@ export const studentService = {
   },
 };
 
+export const notificationService = {
+  async getNotifications(params = {}) {
+    const query = new URLSearchParams();
+    if (params.is_read !== undefined && params.is_read !== '') query.append('is_read', params.is_read);
+    if (params.unread) query.append('unread', 'true');
+    if (params.type) query.append('type', params.type);
+    if (params.search) query.append('search', params.search);
+    if (params.scope) query.append('scope', params.scope);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    const res = await apiRequest(`/notifications/${qs}`);
+    if (!res.ok) {
+      throw new Error('Failed to load notifications.');
+    }
+    return res.json();
+  },
 
+  async getUnreadCount() {
+    const res = await apiRequest('/notifications/unread-count/');
+    if (!res.ok) {
+      return { unread_count: 0 };
+    }
+    return res.json();
+  },
 
+  async markAsRead(id) {
+    const res = await apiRequest(`/notifications/${id}/mark-as-read/`, {
+      method: 'POST',
+    });
+    if (!res.ok) {
+      throw new Error('Failed to mark notification as read.');
+    }
+    return res.json();
+  },
 
+  async markAllAsRead() {
+    const res = await apiRequest('/notifications/mark-all-as-read/', {
+      method: 'POST',
+    });
+    if (!res.ok) {
+      throw new Error('Failed to mark all as read.');
+    }
+    return res.json();
+  },
+
+  async broadcast(payload) {
+    const res = await apiRequest('/notifications/broadcast/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Broadcast failed.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Broadcast failed.');
+    }
+    return res.json();
+  },
+
+  async dispatchReminders(reminderType = 'DUE_SOON') {
+    const res = await apiRequest('/notifications/dispatch-reminders/', {
+      method: 'POST',
+      body: JSON.stringify({ reminder_type: reminderType }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to dispatch reminders.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to dispatch reminders.');
+    }
+    return res.json();
+  },
+};

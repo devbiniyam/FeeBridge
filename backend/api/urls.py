@@ -22,6 +22,8 @@ from api.views.notifications import (
     NotificationMarkAsReadView,
     NotificationMarkAllAsReadView,
     NotificationUnreadCountView,
+    NotificationBroadcastView,
+    NotificationDispatchRemindersView,
 )
 from api.views.reports import FinancialSummaryReportView, GradeBreakdownReportView
 from api.views.gateways import (
@@ -61,6 +63,8 @@ urlpatterns = [
 
     path('notifications/', NotificationListCreateView.as_view(), name='notification-list-create'),
     path('notifications/unread-count/', NotificationUnreadCountView.as_view(), name='notification-unread-count'),
+    path('notifications/broadcast/', NotificationBroadcastView.as_view(), name='notification-broadcast'),
+    path('notifications/dispatch-reminders/', NotificationDispatchRemindersView.as_view(), name='notification-dispatch-reminders'),
     path('notifications/mark-all-as-read/', NotificationMarkAllAsReadView.as_view(), name='notification-mark-all-as-read'),
     path('notifications/<int:pk>/', NotificationDetailView.as_view(), name='notification-detail'),
     path('notifications/<int:pk>/mark-as-read/', NotificationMarkAsReadView.as_view(), name='notification-mark-as-read'),

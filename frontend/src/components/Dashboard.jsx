@@ -390,18 +390,23 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               </div>
 
               {/* SMS & Alerts Notification Hub */}
-              <div className="fintech-module-box box-notifications">
+              <div
+                className="fintech-module-box box-notifications"
+                onClick={() => onNavigate('notifications')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="module-box-top">
                   <div className="module-bubble bubble-rose">
                     <Bell size={22} />
                   </div>
-                  <span className="module-status-chip chip-subtle">SMS Ready</span>
+                  <span className="module-status-chip chip-live">Live Hub</span>
                 </div>
-                <h4>Billing Alerts & SMS</h4>
-                <p>Instant SMS notifications and email payment receipts upon every automated or manual settlement.</p>
+                <h4>Billing Alerts & Notifications</h4>
+                <p>Instant payment receipts, due reminders, and official campus broadcasts with direct settlement actions.</p>
                 <div className="module-box-footer">
-                  <span className="module-action-link text-muted">
-                    Automated via Twilio / Ethio Telecom
+                  <span className="module-action-link">
+                    Open Alerts Hub <ChevronRight size={14} />
                   </span>
                 </div>
               </div>
@@ -483,6 +488,28 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
                 <div className="module-box-footer">
                   <span className="module-action-link">
                     Audit & Reports <ChevronRight size={14} />
+                  </span>
+                </div>
+              </div>
+
+              {/* Campus Alerts & Broadcasts */}
+              <div
+                className="fintech-module-box box-notifications"
+                onClick={() => onNavigate('notifications')}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="module-box-top">
+                  <div className="module-bubble bubble-rose">
+                    <Bell size={22} />
+                  </div>
+                  <span className="module-status-chip chip-live">Live Hub</span>
+                </div>
+                <h4>Alerts & Campus Broadcasts</h4>
+                <p>Broadcast campus announcements, dispatch automatic fee reminders, and monitor delivered alerts.</p>
+                <div className="module-box-footer">
+                  <span className="module-action-link">
+                    Open Alerts Hub <ChevronRight size={14} />
                   </span>
                 </div>
               </div>

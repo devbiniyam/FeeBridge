@@ -300,3 +300,41 @@ class NotificationAPITests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data['status'], NotificationStatusChoices.SENT)
         self.assertEqual(res.data['message'], "School will be closed this Friday.")
+
+    def test_staff_broadcast_all_parents(self):
+        school = School.objects.create(name="Apex Academy", phone_number="+251900000000", unique_code="APX01")
+        Student.objects.create(
+            full_name="Kid One",
+            gender=GenderChoices.MALE,
+            grade=10,
+            section="A",
+            parent=self.parent1,
+            school=school,
+            date_of_birth=date(2010, 1, 1),
+            status=StudentStatusChoices.ACTIVE
+        )
+        self.client.force_authenticate(user=self.staff)
+        res = self.client.post('/api/notifications/broadcast/', {
+            "audience_type": "ALL_PARENTS",
+            "title": "Exam Schedule",
+            "message": "Final examinations commence next Monday."
+        })
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertIn("dispatched", res.data['detail'])
+
+    def test_parent_cannot_broadcast(self):
+        self.client.force_authenticate(user=self.parent1)
+        res = self.client.post('/api/notifications/broadcast/', {
+            "audience_type": "ALL_PARENTS",
+            "message": "Spam test"
+        })
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_staff_dispatch_reminders(self):
+        self.client.force_authenticate(user=self.staff)
+        res = self.client.post('/api/notifications/dispatch-reminders/', {
+            "reminder_type": "DUE_SOON"
+        })
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("dispatched_count", res.data)
+
