@@ -454,3 +454,108 @@ export const reportService = {
   },
 };
 
+export const schoolService = {
+  async getSchools(search = '') {
+    const qs = search ? `?search=${encodeURIComponent(search)}` : '';
+    const res = await apiRequest(`/schools/${qs}`);
+    if (!res.ok) {
+      throw new Error('Failed to load campuses.');
+    }
+    return res.json();
+  },
+
+  async getSchool(id) {
+    const res = await apiRequest(`/schools/${id}/`);
+    if (!res.ok) {
+      throw new Error('Failed to load campus details.');
+    }
+    return res.json();
+  },
+
+  async createSchool(data) {
+    const res = await apiRequest('/schools/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to onboard campus.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to onboard campus.');
+    }
+    return res.json();
+  },
+
+  async updateSchool(id, data) {
+    const res = await apiRequest(`/schools/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to update campus.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to update campus.');
+    }
+    return res.json();
+  },
+
+  async deleteSchool(id) {
+    const res = await apiRequest(`/schools/${id}/`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      throw new Error('Failed to delete campus.');
+    }
+    return true;
+  },
+};
+
+export const staffService = {
+  async getStaffList(schoolId = null, search = '') {
+    const params = new URLSearchParams();
+    if (schoolId) params.append('school', schoolId);
+    if (search) params.append('search', search);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await apiRequest(`/staff/${qs}`);
+    if (!res.ok) {
+      throw new Error('Failed to load staff list.');
+    }
+    return res.json();
+  },
+
+  async createStaff(data) {
+    const res = await apiRequest('/staff/create/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to provision staff member.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to provision staff member.');
+    }
+    return res.json();
+  },
+
+  async updateStaff(id, data) {
+    const res = await apiRequest(`/staff/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to update staff member.' }));
+      const errorMsg = typeof err === 'object' ? Object.values(err)[0] : err;
+      throw new Error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg || 'Failed to update staff member.');
+    }
+    return res.json();
+  },
+
+  async deleteStaff(id) {
+    const res = await apiRequest(`/staff/${id}/`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      throw new Error('Failed to delete staff member.');
+    }
+    return true;
+  },
+};
+

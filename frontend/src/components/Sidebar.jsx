@@ -151,7 +151,28 @@ export default function Sidebar({ currentView, onSelectView, unreadCount = 0 }) 
           </button>
         </div>
 
-        {/* Section 3: System */}
+        {/* Section 3: Central Tenancy Governance (Super-Admin Only) */}
+        {isAdmin && (
+          <div className="nav-group">
+            <span className="nav-group-title">TENANCY & GOVERNANCE</span>
+
+            <button
+              type="button"
+              className={`sidebar-nav-item ${currentView === 'campuses' ? 'nav-item-active' : ''}`}
+              onClick={() => onSelectView('campuses')}
+              title="Super-Admin Multi-Campus & Staff Governance Console"
+            >
+              <div className="nav-item-icon icon-purple-tint">
+                <Building size={18} />
+              </div>
+              <span className="nav-item-label">Campus Governance</span>
+              <span className="nav-badge-subtle">Admin</span>
+              {currentView === 'campuses' && <div className="nav-active-pill" />}
+            </button>
+          </div>
+        )}
+
+        {/* Section 4: System */}
         <div className="nav-group">
           <span className="nav-group-title">COMMUNICATION</span>
 

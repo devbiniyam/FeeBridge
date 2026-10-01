@@ -305,6 +305,16 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
                 <BarChart3 size={15} className="text-emerald" />
                 <span>Collection Reports & Audit</span>
               </button>
+              {isAdmin && (
+                <button
+                  type="button"
+                  className="btn-quick-chip"
+                  onClick={() => onNavigate('campuses')}
+                >
+                  <Building size={15} className="text-purple" />
+                  <span>Campus Governance & Staff</span>
+                </button>
+              )}
             </>
           )}
 
@@ -545,6 +555,30 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
                   </span>
                 </div>
               </div>
+
+              {/* Super-Admin Institutional Campus Governance */}
+              {isAdmin && (
+                <div
+                  className="fintech-module-box box-campuses"
+                  onClick={() => onNavigate('campuses')}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="module-box-top">
+                    <div className="module-bubble bubble-purple">
+                      <Building size={22} />
+                    </div>
+                    <span className="module-status-chip chip-purple">Super-Admin</span>
+                  </div>
+                  <h4>Institutional Campus Governance</h4>
+                  <p>Onboard new school tenants, provision bursar operator credentials, and monitor nationwide enrollment rosters.</p>
+                  <div className="module-box-footer">
+                    <span className="module-action-link">
+                      Manage Campuses & Staff <ChevronRight size={14} />
+                    </span>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

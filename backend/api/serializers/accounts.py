@@ -43,3 +43,24 @@ class StaffCreateSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class StaffSerializer(serializers.ModelSerializer):
+    school_name = serializers.ReadOnlyField(source='school.name')
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'gender',
+            'role',
+            'school',
+            'school_name',
+            'is_active',
+            'date_joined',
+        ]
+        read_only_fields = ['role', 'date_joined']

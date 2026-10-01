@@ -11,6 +11,7 @@ import StudentsView from './components/StudentsView';
 import NotificationsView from './components/NotificationsView';
 import FeeStructuresView from './components/FeeStructuresView';
 import ReportsView from './components/ReportsView';
+import AdminCampusesView from './components/AdminCampusesView';
 import WalletDepositModal from './components/WalletDepositModal';
 import GenerateInvoicesModal from './components/GenerateInvoicesModal';
 import { notificationService } from './services/api';
@@ -127,6 +128,12 @@ function MainContent() {
             <ReportsView
               onNavigateBack={() => setCurrentView('dashboard')}
               onNavigateToInvoices={() => setCurrentView('invoices')}
+            />
+          ) : currentView === 'campuses' ? (
+            <AdminCampusesView
+              onNavigateBack={() => setCurrentView('dashboard')}
+              onNavigateToInvoices={() => setCurrentView('invoices')}
+              onNavigateToReports={() => setCurrentView('reports')}
             />
           ) : (
             <Dashboard

@@ -54,6 +54,8 @@ export default function Navbar({
         return isParent ? 'Official Tuition Schedule' : 'Campus Fee Structures & Multi-Grade Pricing';
       case 'reports':
         return isParent ? 'Tuition Statements & Settlement Ledger' : 'Financial Analytics & Audit Console';
+      case 'campuses':
+        return 'Institutional Campuses & Tenant Governance';
       default:
         return 'Financial Overview';
     }

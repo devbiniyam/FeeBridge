@@ -8200,6 +8200,462 @@ input:checked + .toggle-slider:before {
   }
 }
 
+/* ==========================================================================
+   FEATURE 8: MULTI-CAMPUS & INSTITUTIONAL TENANT ADMINISTRATION (SUPER-ADMIN)
+   ========================================================================== */
+
+.admin-campuses-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 3rem;
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 720px;
+}
+
+.admin-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-main-heading {
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.admin-sub-heading {
+  font-family: var(--font-sub);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.admin-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-kpi-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.campus-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.campus-search-wrap input {
+  padding-left: 2.35rem !important;
+}
+
+/* Campus Profile Cards Grid */
+.campuses-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.campus-profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campus-profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
+}
+
+.campus-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.campus-identity-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.campus-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.campus-card-name {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.campus-meta-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.campus-code-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6d28d9;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.campus-id-pill {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-family: var(--font-sub);
+}
+
+.btn-card-edit {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 0.35rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-card-edit:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.campus-contact-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--font-sub);
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.campus-card-divider {
+  border: none;
+  border-top: 1px dashed #e2e8f0;
+  margin: 0.2rem 0;
+}
+
+.campus-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.metric-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.6rem;
+  text-align: center;
+}
+
+.metric-chip-label {
+  font-family: var(--font-sub);
+  font-size: 0.68rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.metric-chip-val {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.campus-figures-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sub);
+  font-size: 0.78rem;
+  margin-top: 0.2rem;
+}
+
+.fig-label {
+  color: #64748b;
+  margin-right: 0.35rem;
+}
+
+.fig-val {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.campus-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.btn-campus-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-campus-action:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-campus-primary {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.btn-campus-primary:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+/* Staff Operators Section */
+.staff-filters-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.staff-operator-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.staff-avatar {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 700;
+  font-size: 0.8rem;
+  width: 34px;
+  height: 34px;
+}
+
+.staff-name {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.staff-role-pill {
+  display: block;
+  font-family: var(--font-sub);
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.cell-text-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: #334155;
+}
+
+.cell-text-muted {
+  font-family: var(--font-sub);
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.campus-cell-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+}
+
+.status-badge-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.btn-sm-table {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+}
+
+/* Modal Form Grid Helpers */
+.modal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group-half {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.with-icon-left {
+  padding-left: 2.35rem !important;
+}
+
+.input-icon-left {
+  position: absolute;
+  left: 0.85rem;
+  pointer-events: none;
+}
+
+.uppercase-input {
+  text-transform: uppercase;
+}
+
+.input-hint {
+  font-family: var(--font-sub);
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 0.2rem;
+}
+
+.box-campuses {
+  border-color: #ddd6fe !important;
+}
+
+.box-campuses:hover {
+  border-color: #c4b5fd !important;
+}
+
+@media (max-width: 1100px) {
+  .admin-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .campuses-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .staff-filters-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group-half {
+    grid-column: 1 / -1;
+  }
+
+  .staff-filters-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 
 

@@ -1,6 +1,13 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.views.accounts import MeView, RegisterView, StaffCreateView
+from api.views.accounts import (
+    MeView,
+    RegisterView,
+    StaffCreateView,
+    StaffListView,
+    StaffDetailView
+)
+from api.views.schools import SchoolListCreateView, SchoolDetailView
 from api.views.students import StudentListCreateView, StudentDetailView
 from api.views.fees import (
     FeeStructureListCreateView,
@@ -63,7 +70,11 @@ urlpatterns = [
     path('wallets/deposit/', DepositView.as_view(), name='wallet-deposit'),
     path('wallets/pay-invoice/', WalletPaymentView.as_view(), name='wallet-pay-invoice'),
     
+    path('schools/', SchoolListCreateView.as_view(), name='school-list-create'),
+    path('schools/<int:pk>/', SchoolDetailView.as_view(), name='school-detail'),
+    path('staff/', StaffListView.as_view(), name='staff-list'),
     path('staff/create/', StaffCreateView.as_view(), name='staff-create'),
+    path('staff/<int:pk>/', StaffDetailView.as_view(), name='staff-detail'),
 
     path('notifications/', NotificationListCreateView.as_view(), name='notification-list-create'),
     path('notifications/unread-count/', NotificationUnreadCountView.as_view(), name='notification-unread-count'),
