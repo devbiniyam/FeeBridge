@@ -273,10 +273,10 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               <button
                 type="button"
                 className="btn-quick-chip"
-                onClick={() => onNavigate('wallet')}
+                onClick={() => onNavigate('reports')}
               >
-                <CreditCard size={15} className="text-indigo" />
-                <span>Manage Digital Card & Statements</span>
+                <BarChart3 size={15} className="text-teal" />
+                <span>Tuition Audit Statement</span>
               </button>
             </>
           ) : (
@@ -300,10 +300,10 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               <button
                 type="button"
                 className="btn-quick-chip"
-                onClick={() => onNavigate('invoices')}
+                onClick={() => onNavigate('reports')}
               >
-                <Receipt size={15} className="text-emerald" />
-                <span>Open Invoice Billing Dashboard</span>
+                <BarChart3 size={15} className="text-emerald" />
+                <span>Collection Reports & Audit</span>
               </button>
             </>
           )}
@@ -410,6 +410,28 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
                   </span>
                 </div>
               </div>
+
+              {/* Tuition Financial Statement & Audit */}
+              <div
+                className="fintech-module-box box-analytics"
+                onClick={() => onNavigate('reports')}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="module-box-top">
+                  <div className="module-bubble bubble-emerald">
+                    <BarChart3 size={22} />
+                  </div>
+                  <span className="module-status-chip chip-emerald">Statement</span>
+                </div>
+                <h4>Tuition Statement & Receipts</h4>
+                <p>Complete multi-student tuition ledger, verified digital payment receipts, and official statement export.</p>
+                <div className="module-box-footer">
+                  <span className="module-action-link">
+                    Open Tuition Statement <ChevronRight size={14} />
+                  </span>
+                </div>
+              </div>
             </>
           ) : (
             <>
@@ -481,7 +503,12 @@ export default function Dashboard({ onNavigate, onTriggerDeposit, onTriggerGener
               </div>
 
               {/* Financial Analytics */}
-              <div className="fintech-module-box box-analytics">
+              <div
+                className="fintech-module-box box-analytics"
+                onClick={() => onNavigate('reports')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="module-box-top">
                   <div className="module-bubble bubble-emerald">
                     <BarChart3 size={22} />

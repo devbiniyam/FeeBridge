@@ -419,3 +419,38 @@ export const feeStructureService = {
   },
 };
 
+export const reportService = {
+  async getFinancialSummary(schoolId = null) {
+    const query = schoolId ? `?school=${schoolId}` : '';
+    const res = await apiRequest(`/reports/financial-summary/${query}`);
+    if (!res.ok) {
+      throw new Error('Failed to load financial summary report.');
+    }
+    return res.json();
+  },
+
+  async getGradeBreakdown(schoolId = null) {
+    const query = schoolId ? `?school=${schoolId}` : '';
+    const res = await apiRequest(`/reports/grade-breakdown/${query}`);
+    if (!res.ok) {
+      throw new Error('Failed to load grade breakdown report.');
+    }
+    return res.json();
+  },
+
+  async getAuditLedger(params = {}) {
+    const searchParams = new URLSearchParams();
+    if (params.search) searchParams.append('search', params.search);
+    if (params.method) searchParams.append('method', params.method);
+    if (params.from_date) searchParams.append('from_date', params.from_date);
+    if (params.to_date) searchParams.append('to_date', params.to_date);
+    if (params.school) searchParams.append('school', params.school);
+    const qs = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    const res = await apiRequest(`/reports/audit-ledger/${qs}`);
+    if (!res.ok) {
+      throw new Error('Failed to load audit ledger.');
+    }
+    return res.json();
+  },
+};
+

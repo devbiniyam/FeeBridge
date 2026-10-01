@@ -13,7 +13,8 @@ import {
   User,
   ChevronRight,
   Sparkles,
-  CreditCard
+  CreditCard,
+  BarChart3
 } from 'lucide-react';
 
 export default function Sidebar({ currentView, onSelectView, unreadCount = 0 }) {
@@ -99,6 +100,20 @@ export default function Sidebar({ currentView, onSelectView, unreadCount = 0 }) 
             </div>
             <span className="nav-item-label">{isParent ? 'Tuition Invoices' : 'Invoice Billing'}</span>
             <span className="nav-tag-live">Live</span>
+          </button>
+
+          <button
+            type="button"
+            className={`sidebar-nav-item ${currentView === 'reports' ? 'nav-item-active' : ''}`}
+            onClick={() => onSelectView('reports')}
+            title={isParent ? 'Tuition Statements & Settlement Ledger' : 'Financial Analytics & Audit Reports'}
+          >
+            <div className="nav-item-icon icon-teal-tint">
+              <BarChart3 size={18} />
+            </div>
+            <span className="nav-item-label">{isParent ? 'Tuition Statement' : 'Analytics & Audit'}</span>
+            <span className="nav-badge-subtle">{isParent ? 'Audit' : 'Ledger'}</span>
+            {currentView === 'reports' && <div className="nav-active-pill" />}
           </button>
         </div>
 

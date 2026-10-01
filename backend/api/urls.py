@@ -25,7 +25,11 @@ from api.views.notifications import (
     NotificationBroadcastView,
     NotificationDispatchRemindersView,
 )
-from api.views.reports import FinancialSummaryReportView, GradeBreakdownReportView
+from api.views.reports import (
+    FinancialSummaryReportView,
+    GradeBreakdownReportView,
+    AuditLedgerReportView
+)
 from api.views.gateways import (
     CheckoutInitializeView,
     ChapaWebhookView,
@@ -71,4 +75,5 @@ urlpatterns = [
 
     path('reports/financial-summary/', FinancialSummaryReportView.as_view(), name='report-financial-summary'),
     path('reports/grade-breakdown/', GradeBreakdownReportView.as_view(), name='report-grade-breakdown'),
+    path('reports/audit-ledger/', AuditLedgerReportView.as_view(), name='report-audit-ledger'),
 ]
