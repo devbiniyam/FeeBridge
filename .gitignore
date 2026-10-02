@@ -9,10 +9,13 @@ __pycache__/
 
 # Django
 *.sqlite3
+staticfiles/
+*.log
 
 # Node / React
 node_modules/
 dist/
+.vercel/
 
 # Editor
 .vscode/
