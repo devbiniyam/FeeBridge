@@ -53,9 +53,17 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    authService.logout();
+    try {
+      authService.logout();
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
+    localStorage.clear();
+    sessionStorage.clear();
     setUser(null);
+    window.location.href = '/';
   };
+
 
   const refreshProfile = async () => {
     try {

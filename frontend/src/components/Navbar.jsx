@@ -29,8 +29,9 @@ export default function Navbar({
   unreadCount = 0,
   onNotificationRead
 }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   if (!user) return null;
+
 
   const isParent = user.role === 'PARENT';
   const walletBalance = parseFloat(user.wallet_balance || 0);
@@ -290,9 +291,35 @@ export default function Navbar({
                 </button>
               </div>
             </div>
+
           )}
+        </div>
+
+        {/* User Profile & Sign Out Button */}
+        <div className="topbar-user-section">
+
+          <div className="topbar-user-badge">
+            <div className="topbar-avatar-circle">
+              {user.first_name ? user.first_name[0] : 'U'}
+              {user.last_name ? user.last_name[0] : ''}
+            </div>
+            <div className="topbar-user-text">
+              <span className="topbar-user-name">{user.first_name} {user.last_name}</span>
+              <span className={`topbar-role-tag role-${user.role.toLowerCase()}`}>{user.role}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn-topbar-signout"
+            onClick={logout}
+            title="Log Out of FeeBridge"
+          >
+            <LogOut size={15} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </div>
     </header>
+
   );
 }
