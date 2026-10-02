@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Phone, Lock, UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Phone, Lock, UserPlus, AlertCircle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
-export default function Register({ onSwitchToLogin }) {
+export default function Register({ onSwitchToLogin, onBackToLanding }) {
+
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     first_name: '',
@@ -41,7 +42,17 @@ export default function Register({ onSwitchToLogin }) {
 
   return (
     <div className="auth-card">
+      {onBackToLanding && (
+        <div className="auth-back-nav">
+          <button type="button" onClick={onBackToLanding} className="btn-back-home">
+            <ArrowLeft size={15} />
+            <span>Back to Home Overview</span>
+          </button>
+        </div>
+      )}
+
       <div className="auth-header">
+
         <h2>Create Parent Account</h2>
         <p>Register as a parent to manage tuition payments and view invoices</p>
       </div>

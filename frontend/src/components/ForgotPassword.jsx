@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Mail, Lock, KeyRound, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft, Send } from 'lucide-react';
 import { authService } from '../services/api';
 
-export default function ForgotPassword({ onSwitchToLogin }) {
+export default function ForgotPassword({ onSwitchToLogin, onBackToLanding }) {
+
   const [step, setStep] = useState(1); // 1: Email, 2: Code & New Password, 3: Success
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -71,7 +72,17 @@ export default function ForgotPassword({ onSwitchToLogin }) {
 
   return (
     <div className="auth-card">
+      {onBackToLanding && (
+        <div className="auth-back-nav">
+          <button type="button" onClick={onBackToLanding} className="btn-back-home">
+            <ArrowLeft size={15} />
+            <span>Back to Home Overview</span>
+          </button>
+        </div>
+      )}
+
       {step === 1 && (
+
         <>
           <div className="auth-header">
             <h2>Reset Password</h2>

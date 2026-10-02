@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
 import ForgotPassword from './components/ForgotPassword';
+import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import InvoicesList from './components/InvoicesList';
 import WalletView from './components/WalletView';
@@ -21,9 +22,24 @@ import './App.css';
 
 function MainContent() {
   const { user, loading } = useAuth();
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register' | 'forgot-password'
+  const [authMode, setAuthMode] = useState('landing'); // 'landing' | 'login' | 'register' | 'forgot-password'
   const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
   const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices' | 'wallet' | 'students' | 'notifications'
+
+  const handleSelectDemo = (role) => {
+    if (role === 'parent') {
+      setAuthEmail('parent@feebridge.com');
+      setAuthPassword('12345678');
+    } else if (role === 'staff') {
+      setAuthEmail('staff@feebridge.com');
+      setAuthPassword('12345678');
+    } else if (role === 'admin') {
+      setAuthEmail('admin@feebridge.com');
+      setAuthPassword('12345678');
+    }
+    setAuthMode('login');
+  };
 
 
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -56,8 +72,17 @@ function MainContent() {
     );
   }
 
-  // Unauthenticated: Professional Centered Auth Shell
+  // Unauthenticated: Landing Page or Auth Shell
   if (!user) {
+    if (authMode === 'landing') {
+      return (
+        <LandingPage
+          onLaunchPortal={(mode = 'login') => setAuthMode(mode)}
+          onSelectDemo={handleSelectDemo}
+        />
+      );
+    }
+
     return (
       <div className="auth-outer-container">
         <div className="auth-brand-masthead">
@@ -75,23 +100,29 @@ function MainContent() {
                 setAuthEmail(email);
                 setAuthMode('forgot-password');
               }}
+              onBackToLanding={() => setAuthMode('landing')}
               initialEmail={authEmail}
+              initialPassword={authPassword}
             />
           ) : authMode === 'register' ? (
-            <Register onSwitchToLogin={() => setAuthMode('login')} />
+            <Register
+              onSwitchToLogin={() => setAuthMode('login')}
+              onBackToLanding={() => setAuthMode('landing')}
+            />
           ) : (
             <ForgotPassword
               onSwitchToLogin={(email) => {
                 if (email) setAuthEmail(email);
                 setAuthMode('login');
               }}
+              onBackToLanding={() => setAuthMode('landing')}
             />
           )}
         </div>
-
       </div>
     );
   }
+
 
   // Authenticated: Pro Fintech Two-Column App Shell (Stripe / Mercury style)
   return (

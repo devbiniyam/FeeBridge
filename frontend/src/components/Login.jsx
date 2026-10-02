@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, LogIn, AlertCircle, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle, Sparkles, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
-export default function Login({ onSwitchToRegister, onSwitchToForgotPassword, initialEmail = '' }) {
+export default function Login({
+  onSwitchToRegister,
+  onSwitchToForgotPassword,
+  onBackToLanding,
+  initialEmail = '',
+  initialPassword = '',
+}) {
   const { login, error } = useAuth();
   const [email, setEmail] = useState(initialEmail);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(initialPassword);
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
@@ -15,6 +21,12 @@ export default function Login({ onSwitchToRegister, onSwitchToForgotPassword, in
       setEmail(initialEmail);
     }
   }, [initialEmail]);
+
+  useEffect(() => {
+    if (initialPassword) {
+      setPassword(initialPassword);
+    }
+  }, [initialPassword]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,6 +54,15 @@ export default function Login({ onSwitchToRegister, onSwitchToForgotPassword, in
 
   return (
     <div className="auth-card">
+      {onBackToLanding && (
+        <div className="auth-back-nav">
+          <button type="button" onClick={onBackToLanding} className="btn-back-home">
+            <ArrowLeft size={15} />
+            <span>Back to Home Overview</span>
+          </button>
+        </div>
+      )}
+
       <div className="auth-header">
         <h2>Welcome Back</h2>
         <p>Sign in to access your FeeBridge account and student fee portal</p>
