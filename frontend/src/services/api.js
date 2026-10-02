@@ -83,6 +83,33 @@ export const authService = {
     return res.json();
   },
 
+  async requestPasswordReset(email) {
+    const res = await fetch(`${API_BASE_URL}/password-reset/request/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to request password reset' }));
+      throw new Error(err.error || err.detail || 'Failed to request password reset');
+    }
+    return res.json();
+  },
+
+  async confirmPasswordReset(payload) {
+    const res = await fetch(`${API_BASE_URL}/password-reset/confirm/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to reset password' }));
+      throw new Error(err.error || err.detail || 'Failed to reset password');
+    }
+    return res.json();
+  },
+
+
   async getProfile() {
     const res = await apiRequest('/me/');
     if (!res.ok) {

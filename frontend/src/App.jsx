@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
+import ForgotPassword from './components/ForgotPassword';
 import Dashboard from './components/Dashboard';
 import InvoicesList from './components/InvoicesList';
 import WalletView from './components/WalletView';
@@ -20,8 +21,10 @@ import './App.css';
 
 function MainContent() {
   const { user, loading } = useAuth();
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register' | 'forgot-password'
+  const [authEmail, setAuthEmail] = useState('');
   const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices' | 'wallet' | 'students' | 'notifications'
+
 
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
@@ -66,11 +69,26 @@ function MainContent() {
         </div>
         <div className="auth-wrapper">
           {authMode === 'login' ? (
-            <Login onSwitchToRegister={() => setAuthMode('register')} />
-          ) : (
+            <Login
+              onSwitchToRegister={() => setAuthMode('register')}
+              onSwitchToForgotPassword={(email) => {
+                setAuthEmail(email);
+                setAuthMode('forgot-password');
+              }}
+              initialEmail={authEmail}
+            />
+          ) : authMode === 'register' ? (
             <Register onSwitchToLogin={() => setAuthMode('login')} />
+          ) : (
+            <ForgotPassword
+              onSwitchToLogin={(email) => {
+                if (email) setAuthEmail(email);
+                setAuthMode('login');
+              }}
+            />
           )}
         </div>
+
       </div>
     );
   }

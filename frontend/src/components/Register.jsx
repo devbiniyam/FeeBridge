@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Phone, Lock, UserPlus, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, Lock, UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function Register({ onSwitchToLogin }) {
   const { register } = useAuth();
@@ -12,6 +12,7 @@ export default function Register({ onSwitchToLogin }) {
     gender: 'MALE',
     password: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -62,7 +63,7 @@ export default function Register({ onSwitchToLogin }) {
                 id="first_name"
                 name="first_name"
                 type="text"
-                placeholder="Abebe"
+                placeholder="John"
                 value={formData.first_name}
                 onChange={handleChange}
                 required
@@ -78,7 +79,7 @@ export default function Register({ onSwitchToLogin }) {
                 id="last_name"
                 name="last_name"
                 type="text"
-                placeholder="Kebede"
+                placeholder="Doe"
                 value={formData.last_name}
                 onChange={handleChange}
                 required
@@ -95,7 +96,7 @@ export default function Register({ onSwitchToLogin }) {
               id="email"
               name="email"
               type="email"
-              placeholder="parent@example.com"
+              placeholder="parent@feebridge.com"
               value={formData.email}
               onChange={handleChange}
               required
@@ -112,7 +113,7 @@ export default function Register({ onSwitchToLogin }) {
                 id="phone_number"
                 name="phone_number"
                 type="tel"
-                placeholder="+251911223344"
+                placeholder="+15551234567"
                 value={formData.phone_number}
                 onChange={handleChange}
                 required
@@ -137,18 +138,26 @@ export default function Register({ onSwitchToLogin }) {
 
         <div className="form-group">
           <label htmlFor="password">Password (min 8 characters)</label>
-          <div className="input-icon-wrapper">
+          <div className="input-icon-wrapper password-input-wrapper">
             <Lock className="input-icon" size={18} />
             <input
               id="password"
               name="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
               required
               minLength={8}
             />
+            <button
+              type="button"
+              className="password-toggle-btn"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
         </div>
 

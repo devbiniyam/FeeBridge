@@ -9,76 +9,81 @@ from wallets.models import Wallet
 
 
 class Command(BaseCommand):
-    help = "Seeds demo users, schools, students, and invoices for production testing."
+    help = "Seeds common demo users (John Doe, Sarah Smith, Robert Johnson), students, and invoices."
 
     def handle(self, *args, **options):
         self.stdout.write("Starting demo data seeding...")
 
         # 1. School
-        school, created = School.objects.get_or_create(
-            unique_code="Ad1001",
+        school, _ = School.objects.get_or_create(
+            unique_code="SCH1001",
             defaults={
-                "name": "ASTU Special Academy",
-                "address": "Adama, Ethiopia",
-                "phone_number": "0911000000",
+                "name": "Springfield Academy",
+                "address": "100 Education Blvd",
+                "phone_number": "+1 555-0199",
             },
         )
-        if created:
-            self.stdout.write(self.style.SUCCESS(f"Created School: {school.name}"))
-        else:
-            self.stdout.write(f"School already exists: {school.name}")
+        school.name = "Springfield Academy"
+        school.save()
+        self.stdout.write(self.style.SUCCESS(f"School synced: {school.name}"))
 
-        # 2. Admin User (bini@gmail.com / 12345678)
-        admin, created = User.objects.get_or_create(
-            email="bini@gmail.com",
+        # 2. Admin User (John Doe / admin@feebridge.com)
+        admin, _ = User.objects.get_or_create(
+            email="admin@feebridge.com",
             defaults={
-                "phone_number": "0911223344",
-                "first_name": "Biniyam",
-                "last_name": "Admin",
+                "phone_number": "+15550001",
+                "first_name": "John",
+                "last_name": "Doe",
                 "role": RoleChoices.ADMIN,
                 "is_staff": True,
                 "is_superuser": True,
             },
         )
+        admin.first_name = "John"
+        admin.last_name = "Doe"
         admin.set_password("12345678")
         admin.role = RoleChoices.ADMIN
         admin.is_staff = True
         admin.is_superuser = True
         admin.school = school
         admin.save()
-        self.stdout.write(self.style.SUCCESS("Admin user synced: bini@gmail.com"))
+        self.stdout.write(self.style.SUCCESS("Admin user synced: John Doe (admin@feebridge.com)"))
 
-        # 3. Staff User (newstaff@example.com / 12345678)
-        staff, created = User.objects.get_or_create(
-            email="newstaff@example.com",
+        # 3. Staff User (Sarah Smith / staff@feebridge.com)
+        staff, _ = User.objects.get_or_create(
+            email="staff@feebridge.com",
             defaults={
-                "phone_number": "0944556677",
-                "first_name": "Dave",
-                "last_name": "Staff",
+                "phone_number": "+15550002",
+                "first_name": "Sarah",
+                "last_name": "Smith",
                 "role": RoleChoices.STAFF,
                 "school": school,
             },
         )
+        staff.first_name = "Sarah"
+        staff.last_name = "Smith"
         staff.set_password("12345678")
         staff.role = RoleChoices.STAFF
         staff.school = school
         staff.save()
-        self.stdout.write(self.style.SUCCESS("Staff user synced: newstaff@example.com"))
+        self.stdout.write(self.style.SUCCESS("Staff user synced: Sarah Smith (staff@feebridge.com)"))
 
-        # 4. Parent User (tinsaye@gmail.com / 12345678)
-        parent, created = User.objects.get_or_create(
-            email="tinsaye@gmail.com",
+        # 4. Parent User (Robert Johnson / parent@feebridge.com)
+        parent, _ = User.objects.get_or_create(
+            email="parent@feebridge.com",
             defaults={
-                "phone_number": "0966338211",
-                "first_name": "Tinsaye",
-                "last_name": "Parent",
+                "phone_number": "+15550003",
+                "first_name": "Robert",
+                "last_name": "Johnson",
                 "role": RoleChoices.PARENT,
             },
         )
+        parent.first_name = "Robert"
+        parent.last_name = "Johnson"
         parent.set_password("12345678")
         parent.role = RoleChoices.PARENT
         parent.save()
-        self.stdout.write(self.style.SUCCESS("Parent user synced: tinsaye@gmail.com"))
+        self.stdout.write(self.style.SUCCESS("Parent user synced: Robert Johnson (parent@feebridge.com)"))
 
         # 5. Parent's Wallet
         wallet, _ = Wallet.objects.get_or_create(parent=parent)
@@ -88,32 +93,37 @@ class Command(BaseCommand):
             wallet.save()
             self.stdout.write(self.style.SUCCESS(f"Seeded Wallet balance: {wallet.balance} ETB"))
 
-        # 6. Students
+        # 6. Students (Alex Johnson and Emily Johnson)
         student1, _ = Student.objects.get_or_create(
             parent=parent,
-            full_name="Nardos T",
+            full_name="Alex Johnson",
             defaults={
-                "gender": GenderChoices.FEMALE,
+                "gender": GenderChoices.MALE,
                 "grade": 12,
-                "section": "1",
+                "section": "A",
                 "school": school,
-                "date_of_birth": date(2008, 1, 15),
+                "date_of_birth": date(2008, 3, 14),
                 "status": StudentStatusChoices.ACTIVE,
             },
         )
+        student1.school = school
+        student1.save()
 
         student2, _ = Student.objects.get_or_create(
             parent=parent,
-            full_name="Elsa Zeru",
+            full_name="Emily Johnson",
             defaults={
                 "gender": GenderChoices.FEMALE,
                 "grade": 12,
-                "section": "1",
+                "section": "A",
                 "school": school,
-                "date_of_birth": date(2008, 5, 20),
+                "date_of_birth": date(2008, 9, 22),
                 "status": StudentStatusChoices.ACTIVE,
             },
         )
+        student2.school = school
+        student2.save()
+
         self.stdout.write(self.style.SUCCESS(f"Students synced: {student1.full_name}, {student2.full_name}"))
 
         # 7. Fee Structures
@@ -128,11 +138,11 @@ class Command(BaseCommand):
             defaults={"amount": Decimal("2500.00")},
         )
 
-        # 8. Sample Invoices for current and upcoming months
+        # 8. Sample Invoices
         today = date.today()
         current_month = date(today.year, today.month, 1)
 
-        # Unpaid invoice for testing payment
+        # Unpaid invoice for Alex
         inv_unpaid, _ = Invoice.objects.get_or_create(
             student=student1,
             month=current_month,
@@ -145,7 +155,7 @@ class Command(BaseCommand):
             },
         )
 
-        # Paid past invoice for testing receipt & history
+        # Paid past invoice for Alex
         past_month_val = 12 if today.month == 1 else today.month - 1
         past_year_val = today.year - 1 if today.month == 1 else today.year
         past_month = date(past_year_val, past_month_val, 1)
@@ -162,7 +172,7 @@ class Command(BaseCommand):
             },
         )
 
-        # Partially paid invoice for Elsa
+        # Partially paid invoice for Emily
         inv_partial, _ = Invoice.objects.get_or_create(
             student=student2,
             month=current_month,
@@ -175,4 +185,11 @@ class Command(BaseCommand):
             },
         )
 
-        self.stdout.write(self.style.SUCCESS("Demo seeding completed successfully!"))
+        # Also support legacy demo accounts if they were created earlier
+        for email, pwd in [("bini@gmail.com", "12345678"), ("tinsaye@gmail.com", "12345678"), ("newstaff@example.com", "12345678")]:
+            legacy_u = User.objects.filter(email=email).first()
+            if legacy_u:
+                legacy_u.set_password(pwd)
+                legacy_u.save()
+
+        self.stdout.write(self.style.SUCCESS("All demo accounts and common names seeded successfully!"))

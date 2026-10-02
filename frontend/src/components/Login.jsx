@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, LogIn, AlertCircle, Sparkles } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle, Sparkles, Eye, EyeOff } from 'lucide-react';
 
-export default function Login({ onSwitchToRegister }) {
+export default function Login({ onSwitchToRegister, onSwitchToForgotPassword, initialEmail = '' }) {
   const { login, error } = useAuth();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
+
+  useEffect(() => {
+    if (initialEmail) {
+      setEmail(initialEmail);
+    }
+  }, [initialEmail]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +26,7 @@ export default function Login({ onSwitchToRegister }) {
 
     setSubmitting(true);
     try {
-      await login(email, password);
+      await login(email.trim(), password);
     } catch (err) {
       setLocalError(err.message || 'Login failed.');
     } finally {
@@ -30,6 +37,7 @@ export default function Login({ onSwitchToRegister }) {
   const handleDemoFill = (demoEmail, demoPassword) => {
     setEmail(demoEmail);
     setPassword(demoPassword);
+    setLocalError('');
   };
 
   return (
@@ -54,7 +62,7 @@ export default function Login({ onSwitchToRegister }) {
             <input
               id="email"
               type="email"
-              placeholder="parent@example.com"
+              placeholder="parent@feebridge.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -63,17 +71,34 @@ export default function Login({ onSwitchToRegister }) {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <div className="input-icon-wrapper">
+          <div className="form-group-header">
+            <label htmlFor="password">Password</label>
+            <button
+              type="button"
+              onClick={() => onSwitchToForgotPassword(email)}
+              className="btn-forgot-password"
+            >
+              Forgot password?
+            </button>
+          </div>
+          <div className="input-icon-wrapper password-input-wrapper">
             <Lock className="input-icon" size={18} />
             <input
               id="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <button
+              type="button"
+              className="password-toggle-btn"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
         </div>
 
@@ -108,21 +133,24 @@ export default function Login({ onSwitchToRegister }) {
           <button
             type="button"
             className="btn-demo btn-demo-parent"
-            onClick={() => handleDemoFill('tinsaye@gmail.com', '12345678')}
+            onClick={() => handleDemoFill('parent@feebridge.com', '12345678')}
+            title="Robert Johnson (Parent)"
           >
             Parent Demo
           </button>
           <button
             type="button"
             className="btn-demo btn-demo-staff"
-            onClick={() => handleDemoFill('newstaff@example.com', '12345678')}
+            onClick={() => handleDemoFill('staff@feebridge.com', '12345678')}
+            title="Sarah Smith (Staff)"
           >
             Staff Demo
           </button>
           <button
             type="button"
             className="btn-demo btn-demo-admin"
-            onClick={() => handleDemoFill('bini@gmail.com', '12345678')}
+            onClick={() => handleDemoFill('admin@feebridge.com', '12345678')}
+            title="John Doe (Admin)"
           >
             Admin Demo
           </button>
