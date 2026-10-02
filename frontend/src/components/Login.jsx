@@ -9,7 +9,7 @@ export default function Login({
   initialEmail = '',
   initialPassword = '',
 }) {
-  const { login, error } = useAuth();
+  const { login, error, setError } = useAuth();
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState(initialPassword);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,9 +28,15 @@ export default function Login({
     }
   }, [initialPassword]);
 
+  const handleBackToLanding = () => {
+    if (setError) setError(null);
+    if (onBackToLanding) onBackToLanding();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError('');
+    if (setError) setError(null);
     if (!email || !password) {
       setLocalError('Please enter both email and password.');
       return;
@@ -50,13 +56,14 @@ export default function Login({
     setEmail(demoEmail);
     setPassword(demoPassword);
     setLocalError('');
+    if (setError) setError(null);
   };
 
   return (
     <div className="auth-card">
       {onBackToLanding && (
         <div className="auth-back-nav">
-          <button type="button" onClick={onBackToLanding} className="btn-back-home">
+          <button type="button" onClick={handleBackToLanding} className="btn-back-home">
             <ArrowLeft size={15} />
             <span>Back to Home Overview</span>
           </button>

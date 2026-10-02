@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
@@ -21,13 +21,23 @@ import { GraduationCap } from 'lucide-react';
 import './App.css';
 
 function MainContent() {
-  const { user, loading } = useAuth();
+  const { user, loading, error, setError } = useAuth();
   const [authMode, setAuthMode] = useState('landing'); // 'landing' | 'login' | 'register' | 'forgot-password'
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'invoices' | 'wallet' | 'students' | 'notifications'
+  const prevUserRef = useRef(user);
+
+  // If an active user was logged out due to inactivity, direct them straight to login with the explanation notice
+  useEffect(() => {
+    if (prevUserRef.current && !user && error) {
+      setAuthMode('login');
+    }
+    prevUserRef.current = user;
+  }, [user, error]);
 
   const handleSelectDemo = (role) => {
+    if (setError) setError(null);
     if (role === 'parent') {
       setAuthEmail('parent@feebridge.com');
       setAuthPassword('12345678');
@@ -77,7 +87,10 @@ function MainContent() {
     if (authMode === 'landing') {
       return (
         <LandingPage
-          onLaunchPortal={(mode = 'login') => setAuthMode(mode)}
+          onLaunchPortal={(mode = 'login') => {
+            if (setError) setError(null);
+            setAuthMode(mode);
+          }}
           onSelectDemo={handleSelectDemo}
         />
       );
@@ -95,27 +108,44 @@ function MainContent() {
         <div className="auth-wrapper">
           {authMode === 'login' ? (
             <Login
-              onSwitchToRegister={() => setAuthMode('register')}
+              onSwitchToRegister={() => {
+                if (setError) setError(null);
+                setAuthMode('register');
+              }}
               onSwitchToForgotPassword={(email) => {
+                if (setError) setError(null);
                 setAuthEmail(email);
                 setAuthMode('forgot-password');
               }}
-              onBackToLanding={() => setAuthMode('landing')}
+              onBackToLanding={() => {
+                if (setError) setError(null);
+                setAuthMode('landing');
+              }}
               initialEmail={authEmail}
               initialPassword={authPassword}
             />
           ) : authMode === 'register' ? (
             <Register
-              onSwitchToLogin={() => setAuthMode('login')}
-              onBackToLanding={() => setAuthMode('landing')}
+              onSwitchToLogin={() => {
+                if (setError) setError(null);
+                setAuthMode('login');
+              }}
+              onBackToLanding={() => {
+                if (setError) setError(null);
+                setAuthMode('landing');
+              }}
             />
           ) : (
             <ForgotPassword
               onSwitchToLogin={(email) => {
+                if (setError) setError(null);
                 if (email) setAuthEmail(email);
                 setAuthMode('login');
               }}
-              onBackToLanding={() => setAuthMode('landing')}
+              onBackToLanding={() => {
+                if (setError) setError(null);
+                setAuthMode('landing');
+              }}
             />
           )}
         </div>

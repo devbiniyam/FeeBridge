@@ -22,6 +22,8 @@ export function AuthProvider({ children }) {
     setUser(null);
     if (isAutoTimeout) {
       setError('Session timed out after 5 minutes of inactivity. Please sign in again.');
+    } else {
+      setError(null);
     }
   }, []);
 
@@ -34,9 +36,9 @@ export function AuthProvider({ children }) {
       if (tokens?.access) {
         const elapsed = Date.now() - (parseInt(lastActivity, 10) || 0);
 
-        // Check if 5 minutes expired while away or browser was closed
+        // Check if 5 minutes expired while away or browser was closed - silently clean up
         if (lastActivity && elapsed > INACTIVITY_TIMEOUT_MS) {
-          logout(true);
+          logout(false);
           setLoading(false);
           return;
         }
